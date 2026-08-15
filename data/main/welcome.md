@@ -1,3 +1,2 @@
-<h1>Welcome to r/Hyperprompting!</h1>
-
-this is interactive, click around :)
+<h1>ORI Sensemaker!</h1>
+(more info coming soon)
