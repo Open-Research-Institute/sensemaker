@@ -1,0 +1,16 @@
+/home/qrx/git/sensemaker
+├── LICENSE
+├── README.md
+├── TEMPLATE.env
+├── context.txt
+├── docs
+├── index.html
+├── package-lock.json
+├── package.json
+├── server.js
+├── servers
+└── vite.config.js
+
+directory: 2 file: 9
+
+ignored: directory (4)

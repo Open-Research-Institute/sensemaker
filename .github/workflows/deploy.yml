@@ -30,7 +30,7 @@ jobs:
 
       - name: Build for GitHub Pages
         env:
-          BASE_URL: /sensemaker
+          BASE_URL: sensemaker/
           # Add any public namespaces here — mirrors your .env QRX_PUBLIC_NAMESPACES
           QRX_PUBLIC_NAMESPACES: main
         run: npm run build:github
@@ -41,5 +41,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           force_orphan: true
-#          cname: hypertext.wiki 
+#          cname: openresearchinstitute.org
 
