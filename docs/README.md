@@ -1,8 +1,8 @@
 <div align=center>
-  <div><img alt="Q for QRx" src="./public/favicon.png" width=96></div>
+  <div><img alt="Q for QRx" src="../public/favicon.png" width=96></div>
   <h1>Generative QR Coding (QRx)</h1>
   <p>Kernel 26.06.14</p>
-  <div><img alt="QR Code for QRx Kernel 26.02.15" src="./public/index.qr.png" width=400></div>
+  <div><img alt="QR Code for QRx Kernel 26.02.15" src="../public/index.qr.png" width=400></div>
 </div>
 
 <br>
