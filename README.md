@@ -1,10 +1,23 @@
 <div align=center>
-  <div><img alt="Q for QRx" src="./public/favicon.png" width=96></div>
-  <h1>Generative QR Coding (QRx)</h1>
+  <div>
+    <img width="679" height="81" alt="sensemaker" src="https://github.com/user-attachments/assets/cb96d8ca-3abe-42c8-ae68-2b05e5e3f797" />
+  </div>
+  <h1>Operating System for making sense of collective experiences</h1>
   <p>Kernel 26.06.14</p>
+  <div><img width="1280" height="639" alt="brave_screenshot_hypertext wiki" src="https://github.com/user-attachments/assets/ba6b18e7-e662-4bbb-bbdc-75d12449654c" /></div>
+</div>
+
+<br>
+
+# Documentation
+> This project is in active development but is in a working state! Preview it at: https://openresearchinstitute.org/sensemaker/
+
+1. The Kernel - learn how to grow this operating system from a single QR Code: [index.html Kernel QR Code](./docs/kernel.md)
+
+<div align=center>
+  <h1>Sourcecode</h1>
   <div><img alt="QR Code for QRx Kernel 26.02.15" src="./public/index.qr.png" width=400></div>
 </div>
-<br>
 
 This qr encodes an html file turning any browser since the 1990s into an offline-first generative REPL to prompt and vibe code. It does this by reimagining the browser's local storage as a file system composed from hyperlinks that functions as a prompt chaining interface 
 
