@@ -79,7 +79,7 @@ function buildServerBootloader(base) {
 
 
           let pathNs = DB;
-          let currentHash = location.hash.replace('#', '') || 'main';
+          let currentHash = location.hash.slice(1).split('?')[0] || 'main';
           let targetItem = pathNs + '/' + currentHash;
           let mainFallbackItem = 'main/' + currentHash;
           let needsReload = false;
@@ -204,7 +204,7 @@ function buildStaticBootloader(base) {
 
 
           let activeNS = DB;
-          let currentHash = location.hash.replace('#', '') || 'main';
+          let currentHash = location.hash.slice(1).split('?')[0] || 'main';
           let targetItem = activeNS + '/' + currentHash;
           let needsReload = false;
 
