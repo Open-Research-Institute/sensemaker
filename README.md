@@ -13,9 +13,8 @@
     <tbody>
         <tr>
             <td>
-                <h4>Postscope</h4>
-                <p><img src="./public/media/skybiome-260818.gif"></p>
-                <p><a href="https://openresearchinstitute.org/sensemaker/#main?windows=skybiome.html{max}">Try it</a>
+                <p><strong>Postscope</strong></p>
+                <p><a href="https://openresearchinstitute.org/sensemaker/#main?windows=skybiome.html{max}"><img src="./public/media/skybiome-260818.gif"></a>
             </td>
         </tr>
     </tbody>
