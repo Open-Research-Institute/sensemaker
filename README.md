@@ -9,6 +9,18 @@
 
 <br>
 
+<table>
+    <tbody>
+        <tr>
+            <td>
+                <h4>Postscope</h4>
+                <p><img src="./public/media/skybiome-260818.gif"></p>
+                <p><a href="https://openresearchinstitute.org/sensemaker/#main?windows=skybiome.html{max}">Try it</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
 # Documentation
 > This project is in active development but is in a working state! Preview it at: https://openresearchinstitute.org/sensemaker/
 
