@@ -516,7 +516,7 @@ window.loadData = async function(keyword, count) {
 
   while (collectedPosts.length < target) {
     var since = new Date(Date.now() - 3*24*60*60*1000).toISOString();
-    var url = "https://api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=" + encodeURIComponent(keyword) + "&limit=" + limit + "&sort=top&since=" + encodeURIComponent(since);    if (cursor) {
+    var url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=" + encodeURIComponent(keyword) + "&limit=" + limit + "&sort=top&since=" + encodeURIComponent(since);    if (cursor) {
       url = url + "&cursor=" + encodeURIComponent(cursor);
     }
     var res = await fetch(url);

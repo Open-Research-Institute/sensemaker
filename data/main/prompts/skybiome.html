@@ -16,7 +16,7 @@
   - style hover-card as a dark card with a colored left border placeholder
 &w&a=1&p=TASK: output a SCRIPT tag that loads AT Protocol data into a global particle list
   - create window.particles = [] and window.loadData = async function(keyword, count)
-  - endpoint: GET https://api.bsky.app/xrpc/app.bsky.feed.searchPosts
+  - endpoint: GET https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts
   - accepts: q (keyword), limit (max 100), sort "top" (ranks by engagement so posts arrive with likes, reposts, and quotes), since (ISO datetime, only posts after this time), cursor (string) for pagination
   - compute since as the current time minus 3 days so posts have had time to accumulate engagement
   - response: {posts: [...], cursor: "string or absent on last page"}
