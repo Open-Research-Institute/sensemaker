@@ -1,0 +1,851 @@
+<style>
+  #postscope-root,
+  #postscope-root * { box-sizing: border-box; }
+  #postscope-root > * { margin: 0; }
+  #postscope-root h1,
+  #postscope-root h2,
+  #postscope-root h3,
+  #postscope-root p { margin: 0; }
+
+  #postscope-root {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #0b0f14;
+    color: #e6edf3;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color-scheme: dark;
+  }
+
+  /* ---------- top bar ---------- */
+  #postscope-root #topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #11161d;
+    border-bottom: 1px solid #30363d;
+  }
+  #postscope-root #topbar label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #8b949e;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  #postscope-root input {
+    font: inherit;
+    color: #e6edf3;
+    background: #0b0f14;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 5px 8px;
+  }
+  #postscope-root input::placeholder { color: #8b949e; }
+  #postscope-root input:hover { border-color: #8b949e; }
+  #postscope-root button {
+    font: inherit;
+    color: #e6edf3;
+    background: #11161d;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  #postscope-root button:hover { border-color: #ff6600; }
+  #postscope-root #submit-btn {
+    background: #ff6600;
+    border-color: #ff6600;
+    color: #0b0f14;
+    font-weight: 600;
+  }
+  #postscope-root #submit-btn:hover { background: #ff7a1a; }
+  #postscope-root #status {
+    margin-left: auto;
+    color: #8b949e;
+    font-size: 12px;
+  }
+
+  #postscope-root button:focus-visible,
+  #postscope-root input:focus-visible,
+  #postscope-root a:focus-visible,
+  #postscope-root [tabindex]:focus-visible {
+    outline: 2px solid #ff6600;
+    outline-offset: 2px;
+  }
+
+  /* ---------- global emoji summary strip ---------- */
+  #postscope-root #global-emoji-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #0b0f14;
+    border-bottom: 1px solid #30363d;
+  }
+  #postscope-root #global-emoji-summary .summary-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #8b949e;
+    margin-right: 6px;
+  }
+  #postscope-root .global-emoji-slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 28px;
+    line-height: 1;
+    background: #11161d;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+  }
+  #postscope-root .global-emoji-count {
+    font-size: 11px;
+    color: #8b949e;
+    background: #11161d;
+    border: 1px solid #30363d;
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-right: 10px;
+  }
+
+  /* ---------- main area ---------- */
+  #postscope-root #main-area {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+  }
+  #postscope-root #stories-pane {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 12px;
+  }
+  #postscope-root #spread-pane {
+    flex: 0 0 32%;
+    width: 32%;
+    min-width: 240px;
+    overflow-y: auto;
+    padding: 12px;
+    border-left: 1px solid #30363d;
+  }
+  #postscope-root .pane-heading {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #8b949e;
+    margin-bottom: 10px;
+  }
+
+  /* ---------- story cards ---------- */
+  #postscope-root .story-card {
+    background: #11161d;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  #postscope-root .story-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+  }
+  #postscope-root .story-card.open { border-color: #ff6600; }
+  #postscope-root .story-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 0;
+    color: inherit;
+    cursor: pointer;
+  }
+  #postscope-root .story-title {
+    flex: 1 1 55%;
+    min-width: 180px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  #postscope-root .story-meta {
+    color: #8b949e;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  #postscope-root .story-emoji-slots {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  #postscope-root .story-emoji-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 20px;
+    line-height: 1;
+  }
+  #postscope-root .story-emoji-count {
+    font-size: 10px;
+    color: #8b949e;
+    background: #0b0f14;
+    border: 1px solid #30363d;
+    border-radius: 999px;
+    padding: 0 5px;
+  }
+  #postscope-root .story-comments {
+    display: none;
+    border-top: 1px solid #30363d;
+    padding: 8px 12px 10px;
+  }
+  #postscope-root .story-card.open .story-comments,
+  #postscope-root .story-head.open + .story-comments { display: block; }
+
+  /* ---------- comment rows ---------- */
+  #postscope-root .comment-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dashed #30363d;
+  }
+  #postscope-root .comment-row:last-child { border-bottom: none; }
+  #postscope-root .comment-emoji { font-size: 18px; line-height: 1; }
+  #postscope-root .comment-author {
+    color: #ff6600;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  #postscope-root .comment-text {
+    font-size: 13px;
+    color: #e6edf3;
+    min-width: 0;
+  }
+
+  /* ---------- spread pane ---------- */
+  #postscope-root .spread-empty {
+    color: #8b949e;
+    font-size: 13px;
+  }
+  #postscope-root .spread-item {
+    background: #11161d;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  #postscope-root .spread-item.is-origin { border-color: #ff6600; }
+  #postscope-root .spread-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #8b949e;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 0 5px;
+    margin-right: 6px;
+  }
+  #postscope-root .spread-badge.is-origin,
+  #postscope-root .spread-item.is-origin .spread-badge {
+    color: #ff6600;
+    border-color: #ff6600;
+  }
+  #postscope-root .spread-time {
+    color: #8b949e;
+    font-size: 11px;
+  }
+
+  /* ---------- scrollbars ---------- */
+  #postscope-root #stories-pane::-webkit-scrollbar,
+  #postscope-root #spread-pane::-webkit-scrollbar { width: 10px; }
+  #postscope-root #stories-pane::-webkit-scrollbar-thumb,
+  #postscope-root #spread-pane::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 6px;
+    border: 2px solid #0b0f14;
+  }
+</style>
+
+<div id="postscope-root" data-emoji-set="😊 😡 😂 🤔 😢 😮 💀">
+
+  <header id="topbar">
+    <label for="start-date">From <input type="date" id="start-date"></label>
+    <label for="end-date">To <input type="date" id="end-date"></label>
+    <button id="submit-btn" type="button">Run</button>
+    <input type="text" id="keyword-input" placeholder="idea or term">
+    <button id="spread-btn" type="button">Trace</button>
+    <button id="download-btn" type="button">Download PNG</button>
+    <span id="status">Idle</span>
+  </header>
+
+  <section id="global-emoji-summary">
+    <h2 class="summary-title">All comments</h2>
+    <span class="global-emoji-slot"></span>
+    <span class="global-emoji-count">0</span>
+    <span class="global-emoji-slot"></span>
+    <span class="global-emoji-count">0</span>
+    <span class="global-emoji-slot"></span>
+    <span class="global-emoji-count">0</span>
+  </section>
+
+  <div id="main-area">
+    <section id="stories-pane">
+      <h2 class="pane-heading">Stories</h2>
+      <div id="story-list"></div>
+    </section>
+    <aside id="spread-pane">
+      <h2 class="pane-heading">Idea spread</h2>
+      <div id="spread-list">
+        <p class="spread-empty">No trace yet. Enter a keyword and hit Trace to see where an idea first appeared and how it spread.</p>
+      </div>
+    </aside>
+  </div>
+
+  <template id="story-row-template" hidden>
+    <article class="story-card">
+      <button class="story-head" type="button">
+        <span class="story-title"></span>
+        <span class="story-meta"></span>
+        <span class="story-emoji-slots">
+          <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+          <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+          <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+        </span>
+      </button>
+      <div class="story-comments"></div>
+    </article>
+  </template>
+
+  <template id="comment-row-template" hidden>
+    <div class="comment-row">
+      <span class="comment-emoji"></span>
+      <span class="comment-author"></span>
+      <div class="comment-text"></div>
+    </div>
+  </template>
+
+</div><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace (mutate in place, never replace) ---------- */
+  if (!w.sentiment || typeof w.sentiment !== "object") { w.sentiment = {}; }
+  if (!w.sentiment.hackernews || typeof w.sentiment.hackernews !== "object") { w.sentiment.hackernews = {}; }
+  var app = w.sentiment.hackernews;
+
+  /* ---------- fixed emoji set from the root element ---------- */
+  var FALLBACK_EMOJI_SET = "😊 😡 😂 🤔 😢 😮 💀";
+  var rootEl = null;
+  try { rootEl = document.getElementById("postscope-root"); } catch (eRoot) { rootEl = null; }
+  var rawSet = "";
+  if (rootEl && typeof rootEl.getAttribute === "function") {
+    rawSet = rootEl.getAttribute("data-emoji-set") || "";
+  }
+  if (!rawSet || !rawSet.trim()) { rawSet = FALLBACK_EMOJI_SET; }
+  var rawEmojis = rawSet.trim().split(/\s+/);
+  var emojis = [];
+  for (var ei = 0; ei < rawEmojis.length; ei++) {
+    if (rawEmojis[ei]) { emojis.push(rawEmojis[ei]); }
+  }
+  if (!emojis.length) { emojis = FALLBACK_EMOJI_SET.split(/\s+/); }
+  app.emojis = emojis;
+
+  app.version = "v0";
+  app.ready = false;
+
+  /* ---------- config defaults (changeable) ---------- */
+  var configDefaults = {
+    algoliaBase: "https://hn.algolia.com/api/v1/",
+    storyTag: "story",
+    maxStories: 25,
+    frontPageMinPoints: 20,
+    commentDepth: "top-level-only",
+    cachePrefix: "hn-emoji-lens:",
+    dateEndInclusive: true,
+    spreadSearchComments: false
+  };
+  var cfg = app.config;
+  if (!cfg || typeof cfg !== "object") { cfg = {}; app.config = cfg; }
+  for (var ck in configDefaults) {
+    if (Object.prototype.hasOwnProperty.call(configDefaults, ck) && cfg[ck] === undefined) {
+      cfg[ck] = configDefaults[ck];
+    }
+  }
+
+  /* ---------- state shape ---------- */
+  var st = app.state;
+  if (!st || typeof st !== "object") { st = {}; app.state = st; }
+  if (!st.range || typeof st.range !== "object") { st.range = { start: null, end: null }; }
+  if (!Array.isArray(st.stories)) { st.stories = []; }
+  if (!Array.isArray(st.commentRows)) { st.commentRows = []; }
+  if (!st.storyTop || typeof st.storyTop !== "object") { st.storyTop = {}; }
+  if (!Array.isArray(st.globalTop)) { st.globalTop = []; }
+  if (!st.spread || typeof st.spread !== "object") { st.spread = { term: "", origin: null, later: [] }; }
+  if (typeof st.loading !== "boolean") { st.loading = false; }
+  if (st.lastError === undefined) { st.lastError = null; }
+
+  /* ---------- tiny event system (mirrors to window CustomEvents) ---------- */
+  var listeners = app._events;
+  if (!listeners || typeof listeners !== "object") { listeners = {}; app._events = listeners; }
+
+  app.on = function (name, fn) {
+    if (typeof fn !== "function") { return app; }
+    var key = String(name);
+    if (!listeners[key]) { listeners[key] = []; }
+    listeners[key].push(fn);
+    return app;
+  };
+
+  app.off = function (name, fn) {
+    var key = String(name);
+    if (!listeners[key]) { return app; }
+    if (typeof fn !== "function") { listeners[key] = []; return app; }
+    var kept = [];
+    for (var i = 0; i < listeners[key].length; i++) {
+      if (listeners[key][i] !== fn) { kept.push(listeners[key][i]); }
+    }
+    listeners[key] = kept;
+    return app;
+  };
+
+  app.emit = function (name, detail) {
+    var key = String(name);
+    var queue = listeners[key] ? listeners[key].slice() : [];
+    for (var i = 0; i < queue.length; i++) {
+      try { queue[i].call(app, detail, key); }
+      catch (err) {
+        if (typeof console !== "undefined" && console.error) {
+          console.error("[hn-emoji-lens] listener failed for '" + key + "'", err);
+        }
+      }
+    }
+    try {
+      w.dispatchEvent(new CustomEvent(key, { detail: detail }));
+    } catch (errModern) {
+      try {
+        var legacy = document.createEvent("CustomEvent");
+        legacy.initCustomEvent(key, false, false, detail);
+        w.dispatchEvent(legacy);
+      } catch (errLegacy) { /* CustomEvent unsupported */ }
+    }
+    return app;
+  };
+
+  /* ---------- shared helpers ---------- */
+  function normalizeText(text) {
+    return String(text === null || text === undefined ? "" : text)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+  }
+
+  function stableHash(text) {
+    var s = String(text === null || text === undefined ? "" : text);
+    var h1 = 5381;
+    var h2 = 52711;
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      h1 = ((h1 * 33) ^ c) >>> 0;
+      h2 = ((h2 * 31) ^ c) >>> 0;
+    }
+    return h1.toString(36) + h2.toString(36);
+  }
+
+  /* ---------- cache: in-memory Map + localStorage persistence ---------- */
+  var memCache = new Map();
+
+  function storageRead(key) {
+    var out = { found: false, value: undefined };
+    try {
+      var raw = w.localStorage.getItem(cfg.cachePrefix + key);
+      if (raw !== null && raw !== undefined) {
+        out.found = true;
+        out.value = JSON.parse(raw);
+      }
+    } catch (eRead) { /* storage unavailable or corrupt entry */ }
+    return out;
+  }
+
+  function storageWrite(key, value) {
+    try {
+      w.localStorage.setItem(cfg.cachePrefix + key, JSON.stringify(value));
+      return true;
+    } catch (eWrite) { return false; }
+  }
+
+  function storageHas(key) {
+    try { return w.localStorage.getItem(cfg.cachePrefix + key) !== null; }
+    catch (eHas) { return false; }
+  }
+
+  /* get / set / has / clear return plain values synchronously, so they are
+     safe to call directly or behind await / Promise.resolve(). */
+  app.cache = {
+    _mem: memCache,
+    stableHash: stableHash,
+    makeKey: function (text) {
+      return "k:" + stableHash(normalizeText(text));
+    },
+    get: function (key) {
+      var k = String(key);
+      if (memCache.has(k)) { return memCache.get(k); }
+      var hit = storageRead(k);
+      if (hit.found) { memCache.set(k, hit.value); return hit.value; }
+      return undefined;
+    },
+    set: function (key, value) {
+      var k = String(key);
+      memCache.set(k, value);
+      storageWrite(k, value);
+      return value;
+    },
+    has: function (key) {
+      var k = String(key);
+      return memCache.has(k) || storageHas(k);
+    },
+    clear: function () {
+      memCache.clear();
+      try {
+        var doomed = [];
+        for (var i = 0; i < w.localStorage.length; i++) {
+          var full = w.localStorage.key(i);
+          if (full && full.indexOf(cfg.cachePrefix) === 0) { doomed.push(full); }
+        }
+        for (var j = 0; j < doomed.length; j++) { w.localStorage.removeItem(doomed[j]); }
+      } catch (eClear) { /* storage unavailable */ }
+      return true;
+    }
+  };
+
+  /* ---------- placeholder public methods (later chains replace in place) ---------- */
+  var placeholderNames = [
+    "loadRange", "reload", "setRange", "loadComments", "classifyText",
+    "renderAll", "expandStory", "collapseStory", "searchSpread", "exportPNG"
+  ];
+
+  function buildPlaceholder(methodName) {
+    return function () {
+      st.lastError = "app." + methodName + "() is not wired yet — v0 namespace placeholder; a later chain must implement it.";
+      app.emit("sentiment:error", { method: methodName });
+      return null;
+    };
+  }
+
+  for (var pi = 0; pi < placeholderNames.length; pi++) {
+    if (typeof app[placeholderNames[pi]] !== "function") {
+      app[placeholderNames[pi]] = buildPlaceholder(placeholderNames[pi]);
+    }
+  }
+
+  /* ---------- utilities ---------- */
+  var HTML_ESCAPES = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  };
+
+  var util = {};
+
+  util.toUnixSeconds = function (value) {
+    if (value === null || value === undefined || value === "") { return null; }
+    var ms = NaN;
+    if (value instanceof Date) {
+      ms = value.getTime();
+    } else if (typeof value === "number" && isFinite(value)) {
+      ms = value > 100000000000 ? value : value * 1000;
+    } else {
+      var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(String(value).trim());
+      if (m) {
+        ms = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      } else {
+        ms = Date.parse(String(value));
+      }
+    }
+    if (isNaN(ms)) { return null; }
+    return Math.floor(ms / 1000);
+  };
+
+  util.endOfDayUnixSeconds = function (value) {
+    var start = util.toUnixSeconds(value);
+    if (start === null) { return null; }
+    return cfg.dateEndInclusive ? start + 86399 : start;
+  };
+
+  util.escapeHtml = function (text) {
+    return String(text === null || text === undefined ? "" : text)
+      .replace(/[&<>"']/g, function (ch) { return HTML_ESCAPES[ch]; });
+  };
+
+  util.clamp = function (n, min, max) {
+    var num = Number(n);
+    if (isNaN(num)) { num = min; }
+    if (num < min) { return min; }
+    if (num > max) { return max; }
+    return num;
+  };
+
+  util.sortEmojiCounts = function (counts) {
+    var entries = [];
+    var i;
+    var key;
+    if (counts instanceof Map) {
+      counts.forEach(function (count, emoji) {
+        entries.push({ emoji: emoji, count: Number(count) || 0 });
+      });
+    } else if (Array.isArray(counts)) {
+      for (i = 0; i < counts.length; i++) {
+        var item = counts[i];
+        if (Array.isArray(item)) {
+          entries.push({ emoji: item[0], count: Number(item[1]) || 0 });
+        } else if (item && typeof item === "object") {
+          entries.push({ emoji: item.emoji, count: Number(item.count) || 0 });
+        }
+      }
+    } else if (counts && typeof counts === "object") {
+      for (key in counts) {
+        if (Object.prototype.hasOwnProperty.call(counts, key)) {
+          entries.push({ emoji: key, count: Number(counts[key]) || 0 });
+        }
+      }
+    }
+    var order = {};
+    for (i = 0; i < app.emojis.length; i++) {
+      if (order[app.emojis[i]] === undefined) { order[app.emojis[i]] = i; }
+    }
+    entries.sort(function (a, b) {
+      if (b.count !== a.count) { return b.count - a.count; }
+      var ai = order[a.emoji] !== undefined ? order[a.emoji] : app.emojis.length;
+      var bi = order[b.emoji] !== undefined ? order[b.emoji] : app.emojis.length;
+      if (ai !== bi) { return ai - bi; }
+      if (a.emoji < b.emoji) { return -1; }
+      if (a.emoji > b.emoji) { return 1; }
+      return 0;
+    });
+    return entries;
+  };
+
+  util.debounce = function (fn, wait) {
+    var delay = typeof wait === "number" && isFinite(wait) ? wait : 200;
+    var timer = null;
+    return function () {
+      var self = this;
+      var args = arguments;
+      if (timer !== null) { clearTimeout(timer); }
+      timer = setTimeout(function () {
+        timer = null;
+        fn.apply(self, args);
+      }, delay);
+    };
+  };
+
+  app.util = util;
+
+  /* ---------- console friendly alias ---------- */
+  w.hnEmoji = app;
+
+  /* ---------- announce ---------- */
+  app.emit("sentiment:namespace", app);
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- resolve shared namespace; bail out if missing ---------- */
+  var app = null;
+  if (w.sentiment && typeof w.sentiment === "object" && w.sentiment.hackernews && typeof w.sentiment.hackernews === "object") {
+    app = w.sentiment.hackernews;
+  }
+  if (!app) {
+    try {
+      w.dispatchEvent(new CustomEvent("sentiment:error", {
+        detail: { method: "loadRange", error: "window.sentiment.hackernews namespace is missing" }
+      }));
+    } catch (eMissing) { /* cannot announce */ }
+    return;
+  }
+  w.hnEmoji = app;
+  var hnEmoji = app;
+
+  var st = app.state;
+  var cfg = app.config;
+  var util = app.util;
+
+  /* ---------- element handles ---------- */
+  function byId(id) { return document.getElementById(id); }
+
+  var statusEl = byId("status");
+  var startInput = byId("start-date");
+  var endInput = byId("end-date");
+  var submitBtn = byId("submit-btn");
+
+  function setStatus(message) {
+    if (statusEl) { statusEl.textContent = message; }
+  }
+
+  var HN_ITEM_BASE = "https://news.ycombinator.com/item";
+
+  /* ---------- hit normalization ---------- */
+  function normalizeHit(hit) {
+    var id = String(hit.objectID);
+    var hnParams = new URLSearchParams();
+    hnParams.set("id", id);
+    var points = Number(hit.points) || 0;
+    return {
+      id: id,
+      title: hit.title || "",
+      url: hit.url || "",
+      hnUrl: HN_ITEM_BASE + "?" + hnParams.toString(),
+      points: points,
+      numComments: Number(hit.num_comments) || 0,
+      author: hit.author || "",
+      createdAt: hit.created_at_i,
+      storyText: hit.story_text || "",
+      frontPage: points >= cfg.frontPageMinPoints,
+      raw: hit
+    };
+  }
+
+  /* ---------- app.loadRange (replaced in place) ---------- */
+  app.loadRange = async function loadRange(startValue, endValue) {
+    st.loading = true;
+    st.lastError = null;
+    setStatus("loading stories");
+    app.emit("sentiment:stories-loading", { start: startValue, end: endValue });
+    try {
+      var startUnix = util.toUnixSeconds(startValue);
+      var endUnix = util.endOfDayUnixSeconds(endValue);
+      if (startUnix === null || endUnix === null) {
+        throw new Error("invalid date range");
+      }
+
+      var url = new URL("search_by_date", cfg.algoliaBase);
+      var sp = url.searchParams;
+      sp.set("tags", cfg.storyTag);
+      sp.set("numericFilters", "created_at_i>" + startUnix + ",created_at_i<" + endUnix);
+
+      var collected = [];
+      var page = 0;
+      var nbPages = 1;
+      while (collected.length < cfg.maxStories && page < nbPages) {
+        sp.set("page", String(page));
+        var resp = await fetch(url.toString(), { method: "GET" });
+        if (!resp.ok) { throw new Error("request failed: HTTP " + resp.status); }
+        var data = await resp.json();
+        var hits = (data && Array.isArray(data.hits)) ? data.hits : [];
+        nbPages = (data && typeof data.nbPages === "number") ? data.nbPages : 0;
+        for (var i = 0; i < hits.length; i++) {
+          collected.push(normalizeHit(hits[i]));
+        }
+        page += 1;
+      }
+      if (collected.length > cfg.maxStories) {
+        collected = collected.slice(0, cfg.maxStories);
+      }
+
+      st.range.start = startValue;
+      st.range.end = endValue;
+      st.stories = collected;
+
+      setStatus("loaded " + collected.length + " stories (" + startValue + " – " + endValue + ")");
+      app.emit("sentiment:stories", st.stories);
+      return st.stories;
+    } catch (err) {
+      var message = (err && err.message) ? err.message : String(err);
+      st.lastError = message;
+      setStatus(message);
+      app.emit("sentiment:error", { method: "loadRange", error: message });
+      return null;
+    } finally {
+      st.loading = false;
+    }
+  };
+
+  /* ---------- app.setRange (replaced in place) ---------- */
+  app.setRange = function setRange(startValue, endValue) {
+    if (startValue !== undefined && startInput) { startInput.value = startValue; }
+    if (endValue !== undefined && endInput) { endInput.value = endValue; }
+    var s = startInput ? startInput.value : (startValue || null);
+    var e = endInput ? endInput.value : (endValue || null);
+    st.range.start = s || null;
+    st.range.end = e || null;
+    return st.range;
+  };
+
+  /* ---------- app.reload (replaced in place) ---------- */
+  app.reload = function reload() {
+    return app.loadRange(st.range.start, st.range.end);
+  };
+
+  /* ---------- header control wiring (no native submit / reload) ---------- */
+  function runFromInputs(ev) {
+    if (ev && typeof ev.preventDefault === "function") { ev.preventDefault(); }
+    var s = startInput ? startInput.value : "";
+    var e = endInput ? endInput.value : "";
+    app.loadRange(s, e);
+  }
+
+  function onDateKeydown(ev) {
+    if (ev && (ev.key === "Enter" || ev.keyCode === 13)) {
+      runFromInputs(ev);
+    }
+  }
+
+  if (submitBtn) {
+    submitBtn.addEventListener("click", runFromInputs);
+  }
+  if (startInput) {
+    startInput.addEventListener("keydown", onDateKeydown);
+  }
+  if (endInput) {
+    endInput.addEventListener("keydown", onDateKeydown);
+  }
+
+  var hostForm = null;
+  if (submitBtn && submitBtn.form) { hostForm = submitBtn.form; }
+  if (!hostForm && startInput && startInput.form) { hostForm = startInput.form; }
+  if (!hostForm && endInput && endInput.form) { hostForm = endInput.form; }
+  if (hostForm) {
+    hostForm.addEventListener("submit", function (ev) {
+      if (ev && typeof ev.preventDefault === "function") { ev.preventDefault(); }
+    });
+  }
+
+  /* ---------- initial run ---------- */
+  if (startInput && endInput && startInput.value && endInput.value) {
+    app.loadRange(startInput.value, endInput.value);
+  } else {
+    setStatus("pick a date range");
+  }
+})();
+</script>
