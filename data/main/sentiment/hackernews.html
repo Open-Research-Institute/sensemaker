@@ -1400,4 +1400,230 @@
   /* ---------- initial paint: show whatever state already exists ---------- */
   app.renderAll();
 })();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "classifier-controls", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- element handles ---------- */
+  var rootEl = document.getElementById("postscope-root");
+  var modelInput = document.getElementById("llm-model");
+  var endpointInput = document.getElementById("llm-endpoint");
+  var keyInput = document.getElementById("llm-key");
+  var emojiInput = document.getElementById("emoji-set");
+  var statusEl = document.getElementById("classifier-status");
+
+  /* ---------- storage key contract: namespaced overrides ---------- */
+  app.config.storageKeys = {
+    model: "sentiment.hackernews.m",
+    endpoint: "sentiment.hackernews.h",
+    key: "sentiment.hackernews.k",
+    emojis: "sentiment.hackernews.emojis"
+  };
+
+  var DEFAULT_EMOJI_SET = ["😊", "😡", "😂", "🤔", "😢", "😮", "💀"];
+
+  /* ---------- storage helpers ----------
+     readNs: stored value or empty string.
+     writeNs: empty value removes the key so blank means inherit global. */
+  function readNs(name) {
+    try {
+      var raw = w.localStorage ? w.localStorage.getItem(name) : null;
+      return raw === null || raw === undefined ? "" : String(raw);
+    } catch (err) {
+      return "";
+    }
+  }
+
+  function writeNs(name, value) {
+    try {
+      var ls = w.localStorage;
+      if (!ls) { return; }
+      var v = value === null || value === undefined ? "" : String(value);
+      if (v === "") { ls.removeItem(name); }
+      else { ls.setItem(name, v); }
+    } catch (err) { /* storage unavailable */ }
+  }
+
+  /* ---------- app.getClassifierConfig: override -> global -> none ----------
+     globals come only from bare localStorage keys "m", "h", "k". */
+  app.getClassifierConfig = function () {
+    var keys = app.config.storageKeys;
+    var nsModel = readNs(keys.model);
+    var nsEndpoint = readNs(keys.endpoint);
+    var nsKey = readNs(keys.key);
+    var gModel = readNs("m");
+    var gEndpoint = readNs("h");
+    var gKey = readNs("k");
+    return {
+      model: nsModel || gModel,
+      endpoint: nsEndpoint || gEndpoint,
+      key: nsKey || gKey,
+      modelSource: nsModel ? "override" : (gModel ? "global" : "none"),
+      endpointSource: nsEndpoint ? "override" : (gEndpoint ? "global" : "none"),
+      keySource: nsKey ? "override" : (gKey ? "global" : "none")
+    };
+  };
+
+  /* ---------- emoji parsing: whitespace split + dedupe ---------- */
+  function parseEmojis(raw) {
+    var out = [];
+    if (raw === null || raw === undefined) { return out; }
+    var parts = String(raw).split(/\s+/);
+    for (var i = 0; i < parts.length; i++) {
+      var token = parts[i];
+      if (token && out.indexOf(token) === -1) { out.push(token); }
+    }
+    return out;
+  }
+
+  /* ---------- app.getEmojiSet: ns override -> root attribute -> default ---------- */
+  app.getEmojiSet = function () {
+    var parsed = parseEmojis(readNs(app.config.storageKeys.emojis));
+    if (parsed.length >= 2) { return parsed; }
+    var root = rootEl || document.getElementById("postscope-root");
+    if (root) {
+      parsed = parseEmojis(root.getAttribute("data-emoji-set"));
+      if (parsed.length >= 2) { return parsed; }
+    }
+    return DEFAULT_EMOJI_SET.slice();
+  };
+
+  /* ---------- classifier status line ---------- */
+  function sourceStatusText() {
+    var cfg = app.getClassifierConfig();
+    return "model: " + cfg.modelSource +
+      " · endpoint: " + cfg.endpointSource +
+      " · key: " + cfg.keySource;
+  }
+
+  function setClassifierStatus(text) {
+    if (statusEl) { statusEl.textContent = text; }
+  }
+
+  /* ---------- populate controls from storage (emits nothing) ---------- */
+  function applyControlValues() {
+    var keys = app.config.storageKeys;
+    var gModel = readNs("m");
+    var gEndpoint = readNs("h");
+    var gKey = readNs("k");
+
+    if (modelInput) {
+      modelInput.value = readNs(keys.model); /* namespaced override only */
+      modelInput.setAttribute("placeholder", gModel ? gModel : "no global model");
+    }
+    if (endpointInput) {
+      endpointInput.value = readNs(keys.endpoint); /* namespaced override only */
+      endpointInput.setAttribute("placeholder", gEndpoint ? gEndpoint : "no global endpoint");
+    }
+    if (keyInput) {
+      keyInput.value = readNs(keys.key); /* override only, never filled from global */
+      keyInput.setAttribute("placeholder", gKey ? "global key present" : "no global key");
+    }
+    if (emojiInput) {
+      emojiInput.value = app.getEmojiSet().join(" ");
+    }
+  }
+
+  /* ---------- app.refreshClassifierControls: re-read storage, no events ---------- */
+  app.refreshClassifierControls = function () {
+    applyControlValues();
+    setClassifierStatus(sourceStatusText());
+    return app.getClassifierConfig();
+  };
+
+  /* ---------- llm override fields: persist + report on edit ---------- */
+  function commitField(storageName, value) {
+    writeNs(storageName, value);
+    setClassifierStatus(sourceStatusText());
+    app.emit("sentiment:classifier-config", app.getClassifierConfig());
+  }
+
+  function bindOverrideField(input, storageName) {
+    if (!input) { return; }
+    var debounced = null;
+    if (app.util && typeof app.util.debounce === "function") {
+      debounced = app.util.debounce(function (value) {
+        commitField(storageName, value);
+      }, 250);
+    }
+    input.addEventListener("input", function () {
+      if (debounced) { debounced(input.value); }
+      else { commitField(storageName, input.value); }
+    });
+    input.addEventListener("change", function () {
+      /* flush the final value immediately on change */
+      if (debounced && typeof debounced.cancel === "function") { debounced.cancel(); }
+      commitField(storageName, input.value);
+    });
+  }
+
+  bindOverrideField(modelInput, app.config.storageKeys.model);
+  bindOverrideField(endpointInput, app.config.storageKeys.endpoint);
+  bindOverrideField(keyInput, app.config.storageKeys.key);
+
+  /* ---------- key field: plaintext storage warning on focus or change ---------- */
+  if (keyInput) {
+    var warnPlaintextKey = function () {
+      setClassifierStatus("key is stored plaintext in localStorage");
+    };
+    keyInput.addEventListener("focus", warnPlaintextKey);
+    keyInput.addEventListener("change", warnPlaintextKey);
+  }
+
+  /* ---------- emoji set field: validate, persist, broadcast ---------- */
+  if (emojiInput) {
+    emojiInput.addEventListener("change", function () {
+      var parsed = parseEmojis(emojiInput.value);
+      if (parsed.length < 2) {
+        emojiInput.value = app.getEmojiSet().join(" ");
+        setClassifierStatus("need at least 2 emojis");
+        return;
+      }
+      var joined = parsed.join(" ");
+      emojiInput.value = joined;
+      writeNs(app.config.storageKeys.emojis, joined);
+
+      var root = rootEl || document.getElementById("postscope-root");
+      if (root) { root.setAttribute("data-emoji-set", joined); }
+
+      /* keep the shared emoji set mutated in place so ordering stays live */
+      if (app.emojiSet && typeof app.emojiSet.length === "number") {
+        app.emojiSet.length = 0;
+        for (var i = 0; i < parsed.length; i++) { app.emojiSet.push(parsed[i]); }
+      } else {
+        app.emojiSet = parsed.slice();
+      }
+
+      setClassifierStatus("emoji set saved");
+      app.emit("sentiment:emoji-set", parsed);
+      if (typeof app.renderAll === "function") {
+        try { app.renderAll(); } catch (err) { /* best effort repaint */ }
+      }
+    });
+  }
+
+  /* ---------- initial paint: values, placeholders, one status line ---------- */
+  applyControlValues();
+  setClassifierStatus(sourceStatusText());
+})();
 </script>

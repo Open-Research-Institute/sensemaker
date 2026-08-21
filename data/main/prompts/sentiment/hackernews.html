@@ -138,4 +138,24 @@
   - add app.on("sentiment:comments-progress") that only updates element id status with done, total, and rows so progress is visible without rebuilding DOM every story
   - call app.renderAll once at the end so existing state is visible even if events fired before this script loaded
   - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that populates and persists the classifier override controls and editable emoji set
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not fetch stories, do not fetch comments, do not classify yet, do not call any parent kernel function
+  - add app.config.storageKeys in place with exact names: model "sentiment.hackernews.m", endpoint "sentiment.hackernews.h", key "sentiment.hackernews.k", emojis "sentiment.hackernews.emojis"
+  - local helper readNs(name) returns localStorage.getItem(name) or empty string, writeNs(name,value) stores non empty values and removes the key when value is empty so blank means inherit global
+  - global defaults come from localStorage.getItem("m"), localStorage.getItem("h"), and localStorage.getItem("k") only, never from parent DOM
+  - replace app.getClassifierConfig in place so it returns {model: ns model or global m, endpoint: ns endpoint or global h, key: ns key or global k, modelSource, endpointSource, keySource} where each source is "override", "global", or "none"
+  - replace app.getEmojiSet in place so it parses ns emojis first, else root element id postscope-root data-emoji-set, else default 😊 😡 😂 🤔 😢 😮 💀, splits on whitespace, dedupes, and falls back to default when fewer than 2 valid tokens remain
+  - populate controls on load: llm-model value is only the namespaced override, placeholder shows global m or "no global model"; llm-endpoint value is only the namespaced override, placeholder shows global h or "no global endpoint"; llm-key is never filled from global, value is only the namespaced override, placeholder shows "global key present" or "no global key"
+  - on input or change for llm-model, llm-endpoint, and llm-key, write that namespaced key, update classifier-status, emit "sentiment:classifier-config" with detail app.getClassifierConfig()
+  - when llm-key gains focus or changes, classifier-status warns "key is stored plaintext in localStorage"
+  - emoji-set input starts from app.getEmojiSet().join(" ")
+  - on emoji-set change validate by splitting whitespace and deduping; if fewer than 2 tokens remain revert the input to app.getEmojiSet().join(" ") and set classifier-status to "need at least 2 emojis"
+  - on valid emoji-set change write the normalized joined string to storageKeys.emojis, set root data-emoji-set to the same string, set classifier-status to "emoji set saved", emit "sentiment:emoji-set" with detail the new array, then call app.renderAll if it exists so slot count and labels stay live
+  - expose app.refreshClassifierControls in place to re read storage and update all four controls plus placeholders without emitting change events
+  - update classifier-status once on load to show whether model, endpoint, and key are using override, global, or none
+  - use app.util.debounce for rapid typing where helpful, but flush the final value on change
+  - ONLY generate this SCRIPT tag, do not return the previous code
 &w
