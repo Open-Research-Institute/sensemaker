@@ -1,312 +1,272 @@
 <div id="postscope-root" data-emoji-set="😊 😡 😂 🤔 😢 😮 💀">
 <style>
-#postscope-root,
-#postscope-root * { box-sizing: border-box; }
-
+#postscope-root, #postscope-root * { box-sizing: border-box; margin: 0; }
 #postscope-root {
-  margin: 0;
+  --ps-bg: #0b0f14;
+  --ps-panel: #11161d;
+  --ps-text: #e6edf3;
+  --ps-muted: #8b949e;
+  --ps-border: #30363d;
+  --ps-accent: #ff6600;
   width: 100%;
   height: 100%;
   min-height: 100vh;
-  min-height: 100dvh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: #0b0f14;
-  color: #e6edf3;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  background: var(--ps-bg);
+  color: var(--ps-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   line-height: 1.45;
   color-scheme: dark;
 }
-#postscope-root > * { margin: 0; }
-#postscope-root h2,
-#postscope-root p { margin: 0; }
-
-/* focus */
-#postscope-root button:focus-visible,
-#postscope-root input:focus-visible,
-#postscope-root a:focus-visible,
-#postscope-root [tabindex]:focus-visible {
-  outline: 2px solid #ff6600;
-  outline-offset: 1px;
-}
-
-/* ===== topbar ===== */
+/* ---- topbar ---- */
 #postscope-root #topbar {
   position: sticky;
   top: 0;
-  z-index: 10;
-  flex-shrink: 0;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  background: #11161d;
-  border-bottom: 1px solid #30363d;
+  gap: 0.5rem 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--ps-panel);
+  border-bottom: 1px solid var(--ps-border);
 }
-#postscope-root #topbar .field {
+#postscope-root #topbar label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: #8b949e;
-  font-size: 12px;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--ps-muted);
 }
-#postscope-root input {
+#postscope-root input, #postscope-root button {
   font: inherit;
-  color: #e6edf3;
-  background: #0b0f14;
-  border: 1px solid #30363d;
+  font-size: 0.85rem;
+  color: var(--ps-text);
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
   border-radius: 6px;
-  padding: 6px 8px;
+  padding: 0.38rem 0.6rem;
 }
-#postscope-root input::placeholder { color: #8b949e; }
-#postscope-root input:hover { border-color: #8b949e; }
-#postscope-root #keyword-input { width: 170px; }
 #postscope-root button {
-  font: inherit;
-  color: #e6edf3;
-  background: #0b0f14;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  padding: 6px 12px;
   cursor: pointer;
+  background: #161d26;
+  transition: border-color 0.15s ease, filter 0.15s ease;
 }
-#postscope-root button:hover { border-color: #ff6600; }
+#postscope-root button:hover { border-color: var(--ps-accent); }
 #postscope-root #submit-btn {
-  background: #ff6600;
-  border-color: #ff6600;
+  background: var(--ps-accent);
+  border-color: var(--ps-accent);
   color: #0b0f14;
   font-weight: 700;
 }
-#postscope-root #submit-btn:hover { background: #ff7a1f; border-color: #ff7a1f; }
-#postscope-root #status {
-  margin-left: auto;
-  color: #8b949e;
-  font-size: 12px;
-}
-
-/* ===== global emoji summary strip ===== */
-#postscope-root #global-emoji-summary {
-  flex-shrink: 0;
+#postscope-root #submit-btn:hover { filter: brightness(1.1); }
+#postscope-root #keyword-input { min-width: 11rem; }
+#postscope-root #status { margin-left: auto; color: var(--ps-muted); font-size: 0.78rem; }
+/* ---- classifier bar (slimmer controls) ---- */
+#postscope-root #classifier-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  padding: 10px 16px;
-  background: #11161d;
-  border-bottom: 1px solid #30363d;
+  gap: 0.4rem 0.6rem;
+  padding: 0.45rem 0.9rem;
+  background: var(--ps-panel);
+  border-bottom: 1px solid var(--ps-border);
 }
-#postscope-root .summary-title {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: #8b949e;
-  margin-right: 6px;
+#postscope-root #classifier-bar input {
+  font-size: 0.78rem;
+  padding: 0.24rem 0.5rem;
+  border-radius: 5px;
+  flex: 1 1 9rem;
+  min-width: 7rem;
 }
-#postscope-root .global-emoji-item {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-}
-#postscope-root .global-emoji-slot {
-  font-size: 32px;
-  line-height: 1;
-  min-width: 36px;
-  text-align: center;
-}
-#postscope-root .global-emoji-count,
-#postscope-root .story-emoji-count {
-  font-size: 10px;
-  line-height: 1.4;
-  color: #8b949e;
-  background: #0b0f14;
-  border: 1px solid #30363d;
-  border-radius: 999px;
-  padding: 1px 6px;
-  min-width: 18px;
-  text-align: center;
-}
-
-/* ===== main area ===== */
-#postscope-root #main-area {
-  flex: 1;
-  min-height: 0;
+#postscope-root #classifier-bar #emoji-set { flex: 0 0 15em; min-width: 0; }
+#postscope-root #classifier-status { color: var(--ps-muted); font-size: 0.74rem; }
+/* ---- global emoji summary strip ---- */
+#postscope-root #global-emoji-summary {
   display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--ps-panel);
+  border-bottom: 1px solid var(--ps-border);
 }
-#postscope-root #stories-pane {
-  flex: 1;
-  min-width: 0;
-  overflow-y: auto;
-  padding: 14px 16px;
-  scrollbar-width: thin;
-  scrollbar-color: #30363d transparent;
+#postscope-root #global-emoji-summary .summary-title { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em; }
+#postscope-root .global-emoji-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.45rem;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
 }
+#postscope-root .global-emoji-count {
+  position: absolute;
+  right: -0.45rem;
+  bottom: -0.45rem;
+  font-size: 0.6rem;
+  line-height: 1;
+  color: var(--ps-muted);
+  background: #1b222c;
+  border: 1px solid var(--ps-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.35rem;
+}
+/* ---- main area ---- */
+#postscope-root #main-area { flex: 1 1 auto; min-height: 0; display: flex; }
+#postscope-root #stories-pane { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 0.9rem; }
 #postscope-root #spread-pane {
   flex: 0 0 32%;
-  width: 32%;
-  min-width: 240px;
+  min-width: 230px;
   overflow-y: auto;
-  padding: 14px 16px;
-  background: #11161d;
-  border-left: 1px solid #30363d;
-  scrollbar-width: thin;
-  scrollbar-color: #30363d transparent;
+  padding: 0.9rem;
+  background: var(--ps-panel);
+  border-left: 1px solid var(--ps-border);
 }
-#postscope-root #stories-pane h2,
-#postscope-root #spread-pane h2 {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .06em;
+#postscope-root #stories-pane h2, #postscope-root #spread-pane h2 {
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #8b949e;
-  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ps-muted);
+  margin-bottom: 0.75rem;
 }
-#postscope-root .spread-empty {
-  color: #8b949e;
-  font-size: 13px;
-}
-
-/* ===== story cards ===== */
+/* ---- story cards ---- */
 #postscope-root .story-card {
-  background: #11161d;
-  border: 1px solid #30363d;
+  background: var(--ps-panel);
+  border: 1px solid var(--ps-border);
   border-radius: 10px;
-  margin-bottom: 10px;
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 #postscope-root .story-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
-  border-color: #8b949e;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  border-color: #3d444d;
 }
-#postscope-root .story-card.open { border-color: #ff6600; }
+#postscope-root .story-card.open { border-color: var(--ps-accent); }
 #postscope-root .story-head {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 14px;
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  text-align: left;
-  color: inherit;
-  cursor: pointer;
-}
-#postscope-root .story-title { font-weight: 600; color: #e6edf3; }
-#postscope-root .story-meta {
-  color: #8b949e;
-  font-size: 12px;
-  white-space: nowrap;
-}
-#postscope-root .story-emoji-slots {
-  margin-left: auto;
-  display: inline-flex;
-  gap: 10px;
-}
-#postscope-root .story-emoji-slot {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  font-size: 22px;
-  line-height: 1;
-  min-width: 24px;
-}
-#postscope-root .story-comments {
-  display: none;
-  border-top: 1px solid #30363d;
-  padding: 6px 14px 12px;
-}
-#postscope-root .story-card.open .story-comments { display: block; }
-
-/* ===== comment rows ===== */
-#postscope-root .comment-row {
-  display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  padding: 8px 0;
-  border-top: 1px dashed #30363d;
+  gap: 0.4rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem 0.9rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
 }
-#postscope-root .comment-row:first-child { border-top: none; }
-#postscope-root .comment-emoji { font-size: 18px; line-height: 1.3; }
-#postscope-root .comment-author {
-  color: #ff6600;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  padding-top: 2px;
+#postscope-root .story-head:hover { background: #141b24; }
+#postscope-root .story-title { font-size: 0.95rem; font-weight: 600; color: var(--ps-text); }
+#postscope-root .story-meta { font-size: 0.74rem; color: var(--ps-muted); }
+#postscope-root .story-emoji-slots { display: flex; gap: 0.45rem; }
+#postscope-root .story-emoji-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  font-size: 1.15rem;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 6px;
 }
-#postscope-root .comment-text {
-  flex: 1;
-  min-width: 0;
-  font-size: 13px;
-  color: #e6edf3;
-}
-
-/* ===== spread list items ===== */
-#postscope-root .spread-item {
-  background: #0b0f14;
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-}
-#postscope-root .spread-item.origin { border-color: #ff6600; }
-#postscope-root .origin-badge {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  color: #ff6600;
-  border: 1px solid #ff6600;
+#postscope-root .story-emoji-count {
+  position: absolute;
+  right: -0.4rem;
+  bottom: -0.4rem;
+  font-size: 0.58rem;
+  line-height: 1;
+  color: var(--ps-muted);
+  background: #1b222c;
+  border: 1px solid var(--ps-border);
   border-radius: 999px;
-  padding: 1px 7px;
-  margin-bottom: 4px;
+  padding: 0.12rem 0.3rem;
 }
-#postscope-root .spread-time {
-  display: block;
-  color: #8b949e;
-  font-size: 11px;
-  margin-bottom: 2px;
+#postscope-root .story-comments { display: none; border-top: 1px solid var(--ps-border); padding: 0.5rem 0.9rem 0.7rem; }
+#postscope-root .story-card.open .story-comments { display: block; }
+/* ---- comment rows ---- */
+#postscope-root .comment-row {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr;
+  column-gap: 0.5rem;
+  row-gap: 0.1rem;
+  padding: 0.45rem 0;
 }
-#postscope-root .spread-item .spread-meta {
-  color: #8b949e;
-  font-size: 12px;
+#postscope-root .comment-row + .comment-row { border-top: 1px solid #21262d; }
+#postscope-root .comment-emoji { grid-row: span 2; font-size: 1.1rem; text-align: center; }
+#postscope-root .comment-author { font-size: 0.74rem; font-weight: 600; color: var(--ps-accent); }
+#postscope-root .comment-text { font-size: 0.84rem; color: var(--ps-text); overflow-wrap: anywhere; }
+/* ---- spread pane items ---- */
+#postscope-root .spread-empty { color: var(--ps-muted); font-size: 0.82rem; }
+#postscope-root .spread-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.6rem;
+}
+#postscope-root .spread-meta { font-size: 0.7rem; color: var(--ps-muted); }
+#postscope-root .origin-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-accent);
+  border: 1px solid var(--ps-accent);
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+}
+/* ---- focus, placeholder, scrollbars ---- */
+#postscope-root :focus-visible { outline: 2px solid var(--ps-accent); outline-offset: 2px; }
+#postscope-root input:focus-visible { outline-offset: 0; border-color: var(--ps-accent); }
+#postscope-root ::placeholder { color: #6e7681; }
+#postscope-root #stories-pane::-webkit-scrollbar, #postscope-root #spread-pane::-webkit-scrollbar { width: 8px; }
+#postscope-root #stories-pane::-webkit-scrollbar-thumb, #postscope-root #spread-pane::-webkit-scrollbar-thumb { background: var(--ps-border); border-radius: 999px; }
+#postscope-root #stories-pane::-webkit-scrollbar-track, #postscope-root #spread-pane::-webkit-scrollbar-track { background: transparent; }
+@media (max-width: 640px) {
+  #postscope-root #main-area { flex-direction: column; }
+  #postscope-root #spread-pane { flex: 0 0 auto; width: auto; min-width: 0; border-left: 0; border-top: 1px solid var(--ps-border); }
 }
 </style>
 
 <header id="topbar">
-  <label class="field">From
-    <input type="date" id="start-date">
-  </label>
-  <label class="field">To
-    <input type="date" id="end-date">
-  </label>
-  <button id="submit-btn" type="button">Run</button>
-  <input type="text" id="keyword-input" placeholder="idea or term">
-  <button id="spread-btn" type="button">Trace</button>
-  <button id="download-btn" type="button">Download PNG</button>
-  <span id="status">Ready</span>
+  <label>From <input type="date" id="start-date"></label>
+  <label>To <input type="date" id="end-date"></label>
+  <button type="submit" id="submit-btn">Run</button>
+  <input type="text" id="keyword-input" placeholder="idea or term" aria-label="idea or term">
+  <button type="button" id="spread-btn">Trace</button>
+  <button type="button" id="download-btn">Download PNG</button>
+  <span id="status" aria-live="polite">idle</span>
 </header>
+
+<div id="classifier-bar">
+  <input type="text" id="llm-model" placeholder="model override, blank inherits global m">
+  <input type="text" id="llm-endpoint" placeholder="endpoint override, blank inherits global h">
+  <input type="password" id="llm-key" placeholder="key override, blank inherits global k" autocomplete="off">
+  <input type="text" id="emoji-set" value="😊 😡 😂 🤔 😢 😮 💀" aria-label="emoji set">
+  <span id="classifier-status" aria-live="polite"></span>
+</div>
 
 <div id="global-emoji-summary">
   <span class="summary-title">All comments</span>
-  <div class="global-emoji-item">
-    <span class="global-emoji-slot"></span>
-    <span class="global-emoji-count"></span>
-  </div>
-  <div class="global-emoji-item">
-    <span class="global-emoji-slot"></span>
-    <span class="global-emoji-count"></span>
-  </div>
-  <div class="global-emoji-item">
-    <span class="global-emoji-slot"></span>
-    <span class="global-emoji-count"></span>
-  </div>
+  <span class="global-emoji-slot"><span class="global-emoji-count">0</span></span>
+  <span class="global-emoji-slot"><span class="global-emoji-count">0</span></span>
+  <span class="global-emoji-slot"><span class="global-emoji-count">0</span></span>
 </div>
 
 <div id="main-area">
@@ -317,14 +277,14 @@
   <aside id="spread-pane">
     <h2>Idea spread</h2>
     <div id="spread-list">
-      <p class="spread-empty">No idea traced yet. Enter a keyword above and press Trace to see where it first appeared and how it spread.</p>
+      <p class="spread-empty">No trace yet — enter an idea or term and press Trace.</p>
     </div>
   </aside>
 </div>
 
 <template id="story-row-template">
-  <article class="story-card">
-    <button class="story-head" type="button">
+  <div class="story-card">
+    <button type="button" class="story-head">
       <span class="story-title"></span>
       <span class="story-meta"></span>
       <span class="story-emoji-slots">
@@ -334,7 +294,7 @@
       </span>
     </button>
     <div class="story-comments"></div>
-  </article>
+  </div>
 </template>
 
 <template id="comment-row-template">
@@ -344,8 +304,8 @@
     <div class="comment-text"></div>
   </div>
 </template>
-
-</div><script>
+</div>
+<script>
 (async function () {
   "use strict";
 

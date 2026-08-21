@@ -14,7 +14,14 @@
     - button id="spread-btn" labelled "Trace"
     - button id="download-btn" labelled "Download PNG"
     - status span id="status" muted text
-  - below header a summary strip id="global-emoji-summary" with title "All comments" and three large emoji slot spans class="global-emoji-slot" plus small count spans class="global-emoji-count"
+  - add a second compact control row id="classifier-bar" directly below topbar and above global-emoji-summary, same dark panel style, containing:
+    - text input id="llm-model" placeholder "model override, blank inherits global m"
+    - text input id="llm-endpoint" placeholder "endpoint override, blank inherits global h"
+    - password input id="llm-key" placeholder "key override, blank inherits global k" autocomplete off
+    - text input id="emoji-set" value="😊 😡 😂 🤔 😢 😮 💀" aria-label "emoji set"
+    - status span id="classifier-status" muted text
+    - style these inputs slightly slimmer than the topbar controls, with the emoji-set input wide enough to show about eight emoji
+  - below classifier bar a summary strip id="global-emoji-summary" with title "All comments" and three large emoji slot spans class="global-emoji-slot" plus small count spans class="global-emoji-count"
   - main area id="main-area" fills remaining height as flex row:
     - section id="stories-pane" flex 1 scrollable with heading "Stories" and div id="story-list"
     - aside id="spread-pane" fixed width about 32 percent of root, scrollable, heading "Idea spread", div id="spread-list", muted empty state text
@@ -29,7 +36,7 @@
   - emoji slots are large, counts are tiny muted chips
   - spread list items are chronological cards with a small origin badge style for the first match using accent border
   - all interactive looking elements get focus-visible outline in accent color
-  - include data-emoji-set="😊 😡 😂 🤔 😢 😮 💀" on postscope-root for later scripts
+  - include data-emoji-set="😊 😡 😂 🤔 😢 😮 💀" on postscope-root as the initial fallback for later scripts
 &w&a=1&p=TASK: output one SCRIPT tag that creates the shared namespace and contracts for the Hacker News emoji lens
   - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
   - use var for all variables
