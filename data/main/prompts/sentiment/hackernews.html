@@ -45,7 +45,7 @@
   - cacheGet and cacheSet should be promise friendly but work synchronously when possible
   - attach placeholder public methods on app so later chains can replace them without changing the object identity: loadRange, reload, setRange, loadComments, classifyText, renderAll, expandStory, collapseStory, searchSpread, exportPNG
   - each placeholder sets state.lastError to a clear "not wired yet" message and emits "sentiment:error" with detail {method:name}
-  - add app.util with: toUnixSeconds from a date input value, endOfDayUnixSeconds honoring config.dateEndInclusive, escapeHtml, clamp, sortEmojiCounts descending by count then by the fixed emoji set order, debounce
+  - add app.util with: localDateString using local getFullYear, getMonth plus one, getDate with zero padding, toUnixSeconds from a date input value, endOfDayUnixSeconds honoring config.dateEndInclusive, escapeHtml, clamp, sortEmojiCounts descending by count then by the fixed emoji set order, debounce
   - expose a console friendly alias window.hnEmoji = app
   - emit "sentiment:namespace" with detail app when done
   - ONLY generate this SCRIPT tag, do not return the previous code
@@ -55,9 +55,11 @@
   - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
   - do not create window.sentiment, do not render rows, do not fetch comments yet
   - prevent any native form submission or page reload from the header controls
+  - set default dates early but never auto submit: if start-date input is empty set it to app.util.localDateString of today minus 7 days, if end-date input is empty set it to app.util.localDateString of today, then update status to "ready"
   - replace app.loadRange in place on the existing app object with async function loadRange(startValue, endValue)
     - set app.state.loading true, app.state.lastError null, update element id status to "loading stories"
     - emit "sentiment:stories-loading" with detail {start:startValue,end:endValue}
+    - mutate app.state.range in place to {start:startValue,end:endValue} and set app.state.stories to [] before fetching so a rerun clears old cards
     - convert startValue with app.util.toUnixSeconds and endValue with app.util.endOfDayUnixSeconds honoring app.config.dateEndInclusive
     - build a URL from app.config.algoliaBase plus "search_by_date" using URL and URLSearchParams
     - set search param tags to app.config.storyTag
@@ -67,16 +69,16 @@
     - response shape is hits array, page number, nbPages number, hitsPerPage number
     - normalize each hit into {id:objectID as string,title,url,hnUrl,points or 0,numComments or 0,author,createdAt:created_at_i,storyText:story_text or "",frontPage: points greater than or equal to app.config.frontPageMinPoints,raw:hit}
     - hnUrl uses the HN item page base with the id as a search param built through URLSearchParams
-    - mutate app.state.range in place to {start:startValue,end:endValue}, replace only app.state.stories with the normalized array
-    - update status to loaded count plus date range
-    - emit "sentiment:stories" with detail app.state.stories
+    - as each hit is normalized push it into app.state.stories and emit "sentiment:story" with detail that story so cards pop in during pagination
+    - update status after each page with collected count plus date range
+    - when finished emit "sentiment:stories" with detail app.state.stories
     - on failure set app.state.lastError, update status with the message, emit "sentiment:error" with detail {method:"loadRange",error:message}
     - always set app.state.loading false before returning
   - replace app.setRange in place so it writes the two date input values, mutates app.state.range, and returns the range
   - replace app.reload in place so it calls app.loadRange with current app.state.range start and end
   - bind click on element id submit-btn to read start-date and end-date values and call app.loadRange
   - bind Enter keydown on start-date and end-date to do the same
-  - if both date inputs already have values at script run time, call app.loadRange once, otherwise update status to "pick a date range"
+  - do not call app.loadRange on script load
   - ONLY generate this SCRIPT tag, do not return the previous code
 &w&a=1&p=TASK: output one SCRIPT tag that fetches the full Algolia item tree for each loaded story and flattens top level comments into global rows
   - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
@@ -95,6 +97,7 @@
     - response item has id, author, text, created_at_i, points, title, url, and children array
     - v0 rule: use only item.children as top level comments, do not walk nested replies yet, but store each top level comment children length as replyCount
     - for every top level child push one row into app.state.commentRows with exact shape {storyId:story.id,storyTitle:story.title,storyUrl:story.url,hnUrl:story.hnUrl,storyPoints:story.points,storyCreatedAt:story.createdAt,commentId:String(child.id),author:child.author or "",text:child.text or "",createdAt:child.created_at_i or 0,replyCount:child.children and child.children.length or 0,emoji:null,raw:child}
+    - immediately emit "sentiment:comment-row" with detail that row so expanded comments and counts can pop in while later stories are still fetching
     - keep rows ordered by story order, then by comment createdAt ascending inside that story
     - after each story update status to "loading comments X of N" and emit "sentiment:comments-progress" with detail {done:X,total:N,rows:app.state.commentRows.length}
     - if one story fails, set app.state.lastError to the message, emit "sentiment:error" with detail {method:"loadComments",storyId:story.id,error:message}, then continue with the next story
@@ -102,5 +105,30 @@
     - return app.state.commentRows
   - add exactly one app.on("sentiment:stories") handler that calls app.loadComments(detail) so a fresh date run automatically pulls comments
   - make repeated runs safe: when "sentiment:stories-loading" fires, clear app.state.commentRows to [] and app.state.storyTop to {} and app.state.globalTop to [] before new fetches begin
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that renders the current data with pending emoji placeholders and pop in updates
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not fetch stories directly, do not fetch comments directly, do not classify yet, do not set dates, do not auto submit
+  - replace app.renderAll in place on the existing app object with function renderAll()
+  - renderAll reads only app.state and existing templates, never raw fetch responses
+  - keep a local Map keyed by story id for rendered story cards so incremental events can update one card without clearing the list
+  - global summary: fill the three elements with class global-emoji-slot using ⏳️ for every slot, set the matching global-emoji-count spans to "pending", and set the summary title to "All comments: N" where N is app.state.commentRows.length
+  - renderStoryCard(story) clones node from template id story-row-template, shows story.title escaped, meta line with points, author, numComments, created date, and frontPage badge "front page" when story.frontPage is true
+  - title links to story.url when present otherwise story.hnUrl, target _blank rel noreferrer
+  - the three story-emoji-slot spans show ⏳️ and story-emoji-count spans show "pending" until a later classifier fills row.emoji values
+  - story comments container starts hidden unless story id is in a local expanded set on app.state._expanded, and the card gets class open when expanded
+  - replace app.expandStory and app.collapseStory in place so they mutate app.state._expanded in place and update only that story card
+  - clicking a story-head toggles that story id in app.state._expanded, prevents default on links inside the head, and updates only that story card
+  - renderCommentRow(row) clones template id comment-row-template, shows comment-emoji as ⏳️, comment-author escaped or "anonymous", comment-text escaped with basic line breaks preserved, and a muted reply count when replyCount is above zero
+  - keep DOM building with DocumentFragment and textContent or escaped HTML only, no innerHTML with raw comment text
+  - add app.on("sentiment:story") that inserts or updates that one story card in story order so stories pop in as pages arrive
+  - add app.on("sentiment:comment-row") that updates the global summary count, updates that story meta comment count, and appends the comment row only when that story is expanded
+  - add app.on("sentiment:stories-loading") that clears the story list Map and story-list element so reruns do not duplicate cards
+  - add app.on("sentiment:stories") that reconciles the full list order and updates empty state
+  - add app.on("sentiment:comments") that calls app.renderAll once to reconcile final counts and expanded comments
+  - add app.on("sentiment:comments-progress") that only updates element id status with done, total, and rows so progress is visible without rebuilding DOM every story
+  - call app.renderAll once at the end so existing state is visible even if events fired before this script loaded
   - ONLY generate this SCRIPT tag, do not return the previous code
 &w

@@ -1,353 +1,349 @@
+<div id="postscope-root" data-emoji-set="😊 😡 😂 🤔 😢 😮 💀">
 <style>
-  #postscope-root,
-  #postscope-root * { box-sizing: border-box; }
-  #postscope-root > * { margin: 0; }
-  #postscope-root h1,
-  #postscope-root h2,
-  #postscope-root h3,
-  #postscope-root p { margin: 0; }
+#postscope-root,
+#postscope-root * { box-sizing: border-box; }
 
-  #postscope-root {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #0b0f14;
-    color: #e6edf3;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.45;
-    color-scheme: dark;
-  }
+#postscope-root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #0b0f14;
+  color: #e6edf3;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  color-scheme: dark;
+}
+#postscope-root > * { margin: 0; }
+#postscope-root h2,
+#postscope-root p { margin: 0; }
 
-  /* ---------- top bar ---------- */
-  #postscope-root #topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background: #11161d;
-    border-bottom: 1px solid #30363d;
-  }
-  #postscope-root #topbar label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #8b949e;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-  #postscope-root input {
-    font: inherit;
-    color: #e6edf3;
-    background: #0b0f14;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    padding: 5px 8px;
-  }
-  #postscope-root input::placeholder { color: #8b949e; }
-  #postscope-root input:hover { border-color: #8b949e; }
-  #postscope-root button {
-    font: inherit;
-    color: #e6edf3;
-    background: #11161d;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    padding: 5px 12px;
-    cursor: pointer;
-    transition: border-color .15s ease, background .15s ease;
-  }
-  #postscope-root button:hover { border-color: #ff6600; }
-  #postscope-root #submit-btn {
-    background: #ff6600;
-    border-color: #ff6600;
-    color: #0b0f14;
-    font-weight: 600;
-  }
-  #postscope-root #submit-btn:hover { background: #ff7a1a; }
-  #postscope-root #status {
-    margin-left: auto;
-    color: #8b949e;
-    font-size: 12px;
-  }
+/* focus */
+#postscope-root button:focus-visible,
+#postscope-root input:focus-visible,
+#postscope-root a:focus-visible,
+#postscope-root [tabindex]:focus-visible {
+  outline: 2px solid #ff6600;
+  outline-offset: 1px;
+}
 
-  #postscope-root button:focus-visible,
-  #postscope-root input:focus-visible,
-  #postscope-root a:focus-visible,
-  #postscope-root [tabindex]:focus-visible {
-    outline: 2px solid #ff6600;
-    outline-offset: 2px;
-  }
+/* ===== topbar ===== */
+#postscope-root #topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #11161d;
+  border-bottom: 1px solid #30363d;
+}
+#postscope-root #topbar .field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8b949e;
+  font-size: 12px;
+}
+#postscope-root input {
+  font: inherit;
+  color: #e6edf3;
+  background: #0b0f14;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+#postscope-root input::placeholder { color: #8b949e; }
+#postscope-root input:hover { border-color: #8b949e; }
+#postscope-root #keyword-input { width: 170px; }
+#postscope-root button {
+  font: inherit;
+  color: #e6edf3;
+  background: #0b0f14;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+#postscope-root button:hover { border-color: #ff6600; }
+#postscope-root #submit-btn {
+  background: #ff6600;
+  border-color: #ff6600;
+  color: #0b0f14;
+  font-weight: 700;
+}
+#postscope-root #submit-btn:hover { background: #ff7a1f; border-color: #ff7a1f; }
+#postscope-root #status {
+  margin-left: auto;
+  color: #8b949e;
+  font-size: 12px;
+}
 
-  /* ---------- global emoji summary strip ---------- */
-  #postscope-root #global-emoji-summary {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px 12px;
-    background: #0b0f14;
-    border-bottom: 1px solid #30363d;
-  }
-  #postscope-root #global-emoji-summary .summary-title {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: #8b949e;
-    margin-right: 6px;
-  }
-  #postscope-root .global-emoji-slot {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 28px;
-    line-height: 1;
-    background: #11161d;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-  }
-  #postscope-root .global-emoji-count {
-    font-size: 11px;
-    color: #8b949e;
-    background: #11161d;
-    border: 1px solid #30363d;
-    border-radius: 999px;
-    padding: 1px 7px;
-    margin-right: 10px;
-  }
+/* ===== global emoji summary strip ===== */
+#postscope-root #global-emoji-summary {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: #11161d;
+  border-bottom: 1px solid #30363d;
+}
+#postscope-root .summary-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-right: 6px;
+}
+#postscope-root .global-emoji-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+#postscope-root .global-emoji-slot {
+  font-size: 32px;
+  line-height: 1;
+  min-width: 36px;
+  text-align: center;
+}
+#postscope-root .global-emoji-count,
+#postscope-root .story-emoji-count {
+  font-size: 10px;
+  line-height: 1.4;
+  color: #8b949e;
+  background: #0b0f14;
+  border: 1px solid #30363d;
+  border-radius: 999px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
 
-  /* ---------- main area ---------- */
-  #postscope-root #main-area {
-    flex: 1 1 auto;
-    min-height: 0;
-    display: flex;
-    flex-direction: row;
-  }
-  #postscope-root #stories-pane {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow-y: auto;
-    padding: 12px;
-  }
-  #postscope-root #spread-pane {
-    flex: 0 0 32%;
-    width: 32%;
-    min-width: 240px;
-    overflow-y: auto;
-    padding: 12px;
-    border-left: 1px solid #30363d;
-  }
-  #postscope-root .pane-heading {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: #8b949e;
-    margin-bottom: 10px;
-  }
+/* ===== main area ===== */
+#postscope-root #main-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+#postscope-root #stories-pane {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #30363d transparent;
+}
+#postscope-root #spread-pane {
+  flex: 0 0 32%;
+  width: 32%;
+  min-width: 240px;
+  overflow-y: auto;
+  padding: 14px 16px;
+  background: #11161d;
+  border-left: 1px solid #30363d;
+  scrollbar-width: thin;
+  scrollbar-color: #30363d transparent;
+}
+#postscope-root #stories-pane h2,
+#postscope-root #spread-pane h2 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-bottom: 12px;
+}
+#postscope-root .spread-empty {
+  color: #8b949e;
+  font-size: 13px;
+}
 
-  /* ---------- story cards ---------- */
-  #postscope-root .story-card {
-    background: #11161d;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-  }
-  #postscope-root .story-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
-  }
-  #postscope-root .story-card.open { border-color: #ff6600; }
-  #postscope-root .story-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 10px 12px;
-    text-align: left;
-    background: none;
-    border: none;
-    border-radius: 0;
-    color: inherit;
-    cursor: pointer;
-  }
-  #postscope-root .story-title {
-    flex: 1 1 55%;
-    min-width: 180px;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  #postscope-root .story-meta {
-    color: #8b949e;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-  #postscope-root .story-emoji-slots {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
-  }
-  #postscope-root .story-emoji-slot {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 20px;
-    line-height: 1;
-  }
-  #postscope-root .story-emoji-count {
-    font-size: 10px;
-    color: #8b949e;
-    background: #0b0f14;
-    border: 1px solid #30363d;
-    border-radius: 999px;
-    padding: 0 5px;
-  }
-  #postscope-root .story-comments {
-    display: none;
-    border-top: 1px solid #30363d;
-    padding: 8px 12px 10px;
-  }
-  #postscope-root .story-card.open .story-comments,
-  #postscope-root .story-head.open + .story-comments { display: block; }
+/* ===== story cards ===== */
+#postscope-root .story-card {
+  background: #11161d;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+#postscope-root .story-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
+  border-color: #8b949e;
+}
+#postscope-root .story-card.open { border-color: #ff6600; }
+#postscope-root .story-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+#postscope-root .story-title { font-weight: 600; color: #e6edf3; }
+#postscope-root .story-meta {
+  color: #8b949e;
+  font-size: 12px;
+  white-space: nowrap;
+}
+#postscope-root .story-emoji-slots {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 10px;
+}
+#postscope-root .story-emoji-slot {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 22px;
+  line-height: 1;
+  min-width: 24px;
+}
+#postscope-root .story-comments {
+  display: none;
+  border-top: 1px solid #30363d;
+  padding: 6px 14px 12px;
+}
+#postscope-root .story-card.open .story-comments { display: block; }
 
-  /* ---------- comment rows ---------- */
-  #postscope-root .comment-row {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px dashed #30363d;
-  }
-  #postscope-root .comment-row:last-child { border-bottom: none; }
-  #postscope-root .comment-emoji { font-size: 18px; line-height: 1; }
-  #postscope-root .comment-author {
-    color: #ff6600;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  #postscope-root .comment-text {
-    font-size: 13px;
-    color: #e6edf3;
-    min-width: 0;
-  }
+/* ===== comment rows ===== */
+#postscope-root .comment-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px dashed #30363d;
+}
+#postscope-root .comment-row:first-child { border-top: none; }
+#postscope-root .comment-emoji { font-size: 18px; line-height: 1.3; }
+#postscope-root .comment-author {
+  color: #ff6600;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+#postscope-root .comment-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #e6edf3;
+}
 
-  /* ---------- spread pane ---------- */
-  #postscope-root .spread-empty {
-    color: #8b949e;
-    font-size: 13px;
-  }
-  #postscope-root .spread-item {
-    background: #11161d;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 8px 10px;
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
-  #postscope-root .spread-item.is-origin { border-color: #ff6600; }
-  #postscope-root .spread-badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    color: #8b949e;
-    border: 1px solid #30363d;
-    border-radius: 4px;
-    padding: 0 5px;
-    margin-right: 6px;
-  }
-  #postscope-root .spread-badge.is-origin,
-  #postscope-root .spread-item.is-origin .spread-badge {
-    color: #ff6600;
-    border-color: #ff6600;
-  }
-  #postscope-root .spread-time {
-    color: #8b949e;
-    font-size: 11px;
-  }
-
-  /* ---------- scrollbars ---------- */
-  #postscope-root #stories-pane::-webkit-scrollbar,
-  #postscope-root #spread-pane::-webkit-scrollbar { width: 10px; }
-  #postscope-root #stories-pane::-webkit-scrollbar-thumb,
-  #postscope-root #spread-pane::-webkit-scrollbar-thumb {
-    background: #30363d;
-    border-radius: 6px;
-    border: 2px solid #0b0f14;
-  }
+/* ===== spread list items ===== */
+#postscope-root .spread-item {
+  background: #0b0f14;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+#postscope-root .spread-item.origin { border-color: #ff6600; }
+#postscope-root .origin-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #ff6600;
+  border: 1px solid #ff6600;
+  border-radius: 999px;
+  padding: 1px 7px;
+  margin-bottom: 4px;
+}
+#postscope-root .spread-time {
+  display: block;
+  color: #8b949e;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+#postscope-root .spread-item .spread-meta {
+  color: #8b949e;
+  font-size: 12px;
+}
 </style>
 
-<div id="postscope-root" data-emoji-set="😊 😡 😂 🤔 😢 😮 💀">
+<header id="topbar">
+  <label class="field">From
+    <input type="date" id="start-date">
+  </label>
+  <label class="field">To
+    <input type="date" id="end-date">
+  </label>
+  <button id="submit-btn" type="button">Run</button>
+  <input type="text" id="keyword-input" placeholder="idea or term">
+  <button id="spread-btn" type="button">Trace</button>
+  <button id="download-btn" type="button">Download PNG</button>
+  <span id="status">Ready</span>
+</header>
 
-  <header id="topbar">
-    <label for="start-date">From <input type="date" id="start-date"></label>
-    <label for="end-date">To <input type="date" id="end-date"></label>
-    <button id="submit-btn" type="button">Run</button>
-    <input type="text" id="keyword-input" placeholder="idea or term">
-    <button id="spread-btn" type="button">Trace</button>
-    <button id="download-btn" type="button">Download PNG</button>
-    <span id="status">Idle</span>
-  </header>
-
-  <section id="global-emoji-summary">
-    <h2 class="summary-title">All comments</h2>
+<div id="global-emoji-summary">
+  <span class="summary-title">All comments</span>
+  <div class="global-emoji-item">
     <span class="global-emoji-slot"></span>
-    <span class="global-emoji-count">0</span>
-    <span class="global-emoji-slot"></span>
-    <span class="global-emoji-count">0</span>
-    <span class="global-emoji-slot"></span>
-    <span class="global-emoji-count">0</span>
-  </section>
-
-  <div id="main-area">
-    <section id="stories-pane">
-      <h2 class="pane-heading">Stories</h2>
-      <div id="story-list"></div>
-    </section>
-    <aside id="spread-pane">
-      <h2 class="pane-heading">Idea spread</h2>
-      <div id="spread-list">
-        <p class="spread-empty">No trace yet. Enter a keyword and hit Trace to see where an idea first appeared and how it spread.</p>
-      </div>
-    </aside>
+    <span class="global-emoji-count"></span>
   </div>
+  <div class="global-emoji-item">
+    <span class="global-emoji-slot"></span>
+    <span class="global-emoji-count"></span>
+  </div>
+  <div class="global-emoji-item">
+    <span class="global-emoji-slot"></span>
+    <span class="global-emoji-count"></span>
+  </div>
+</div>
 
-  <template id="story-row-template" hidden>
-    <article class="story-card">
-      <button class="story-head" type="button">
-        <span class="story-title"></span>
-        <span class="story-meta"></span>
-        <span class="story-emoji-slots">
-          <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
-          <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
-          <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
-        </span>
-      </button>
-      <div class="story-comments"></div>
-    </article>
-  </template>
-
-  <template id="comment-row-template" hidden>
-    <div class="comment-row">
-      <span class="comment-emoji"></span>
-      <span class="comment-author"></span>
-      <div class="comment-text"></div>
+<div id="main-area">
+  <section id="stories-pane">
+    <h2>Stories</h2>
+    <div id="story-list"></div>
+  </section>
+  <aside id="spread-pane">
+    <h2>Idea spread</h2>
+    <div id="spread-list">
+      <p class="spread-empty">No idea traced yet. Enter a keyword above and press Trace to see where it first appeared and how it spread.</p>
     </div>
-  </template>
+  </aside>
+</div>
+
+<template id="story-row-template">
+  <article class="story-card">
+    <button class="story-head" type="button">
+      <span class="story-title"></span>
+      <span class="story-meta"></span>
+      <span class="story-emoji-slots">
+        <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+        <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+        <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+      </span>
+    </button>
+    <div class="story-comments"></div>
+  </article>
+</template>
+
+<template id="comment-row-template">
+  <div class="comment-row">
+    <span class="comment-emoji"></span>
+    <span class="comment-author"></span>
+    <div class="comment-text"></div>
+  </div>
+</template>
 
 </div><script>
 (async function () {
@@ -355,33 +351,42 @@
 
   var w = window;
 
-  /* ---------- shared namespace (mutate in place, never replace) ---------- */
-  if (!w.sentiment || typeof w.sentiment !== "object") { w.sentiment = {}; }
-  if (!w.sentiment.hackernews || typeof w.sentiment.hackernews !== "object") { w.sentiment.hackernews = {}; }
+  /* ============================================================
+     Hacker News emoji lens — shared namespace + contracts (v0)
+     No fetching, no rendering, no submit binding here.
+     ============================================================ */
+
+  /* ---------- namespace: create only if missing, mutate in place ---------- */
+  if (!w.sentiment) { w.sentiment = {}; }
+  if (!w.sentiment.hackernews) { w.sentiment.hackernews = {}; }
   var app = w.sentiment.hackernews;
 
-  /* ---------- fixed emoji set from the root element ---------- */
-  var FALLBACK_EMOJI_SET = "😊 😡 😂 🤔 😢 😮 💀";
-  var rootEl = null;
-  try { rootEl = document.getElementById("postscope-root"); } catch (eRoot) { rootEl = null; }
-  var rawSet = "";
-  if (rootEl && typeof rootEl.getAttribute === "function") {
-    rawSet = rootEl.getAttribute("data-emoji-set") || "";
+  /* ---------- fixed emoji set (read from existing root, else fallback) ---------- */
+  var FALLBACK_EMOJI_SET = ["😊", "😡", "😂", "🤔", "😢", "😮", "💀"];
+  function readEmojiSet() {
+    try {
+      var root = document.getElementById("postscope-root");
+      var raw = root ? root.getAttribute("data-emoji-set") : null;
+      if (raw) {
+        var parts = String(raw).split(/\s+/);
+        var out = [];
+        for (var i = 0; i < parts.length; i++) {
+          if (parts[i]) { out.push(parts[i]); }
+        }
+        if (out.length > 0) { return out; }
+      }
+    } catch (err) { /* fall through to fallback set */ }
+    return FALLBACK_EMOJI_SET.slice();
   }
-  if (!rawSet || !rawSet.trim()) { rawSet = FALLBACK_EMOJI_SET; }
-  var rawEmojis = rawSet.trim().split(/\s+/);
-  var emojis = [];
-  for (var ei = 0; ei < rawEmojis.length; ei++) {
-    if (rawEmojis[ei]) { emojis.push(rawEmojis[ei]); }
-  }
-  if (!emojis.length) { emojis = FALLBACK_EMOJI_SET.split(/\s+/); }
-  app.emojis = emojis;
+  app.emojiSet = readEmojiSet();
 
+  /* ---------- identity / lifecycle ---------- */
   app.version = "v0";
   app.ready = false;
 
-  /* ---------- config defaults (changeable) ---------- */
-  var configDefaults = {
+  /* ---------- config: changeable defaults (fill missing keys only) ---------- */
+  app.config = app.config || {};
+  var CONFIG_DEFAULTS = {
     algoliaBase: "https://hn.algolia.com/api/v1/",
     storyTag: "story",
     maxStories: 25,
@@ -391,80 +396,80 @@
     dateEndInclusive: true,
     spreadSearchComments: false
   };
-  var cfg = app.config;
-  if (!cfg || typeof cfg !== "object") { cfg = {}; app.config = cfg; }
-  for (var ck in configDefaults) {
-    if (Object.prototype.hasOwnProperty.call(configDefaults, ck) && cfg[ck] === undefined) {
-      cfg[ck] = configDefaults[ck];
+  for (var configKey in CONFIG_DEFAULTS) {
+    if (Object.prototype.hasOwnProperty.call(CONFIG_DEFAULTS, configKey) &&
+        app.config[configKey] === undefined) {
+      app.config[configKey] = CONFIG_DEFAULTS[configKey];
     }
   }
 
-  /* ---------- state shape ---------- */
-  var st = app.state;
-  if (!st || typeof st !== "object") { st = {}; app.state = st; }
-  if (!st.range || typeof st.range !== "object") { st.range = { start: null, end: null }; }
-  if (!Array.isArray(st.stories)) { st.stories = []; }
-  if (!Array.isArray(st.commentRows)) { st.commentRows = []; }
-  if (!st.storyTop || typeof st.storyTop !== "object") { st.storyTop = {}; }
-  if (!Array.isArray(st.globalTop)) { st.globalTop = []; }
-  if (!st.spread || typeof st.spread !== "object") { st.spread = { term: "", origin: null, later: [] }; }
-  if (typeof st.loading !== "boolean") { st.loading = false; }
-  if (st.lastError === undefined) { st.lastError = null; }
+  /* ---------- state: canonical shape (fill missing keys only) ---------- */
+  app.state = app.state || {};
+  function ensureState(key, value) {
+    if (app.state[key] === undefined) { app.state[key] = value; }
+  }
+  ensureState("range", { start: null, end: null });
+  ensureState("stories", []);
+  ensureState("commentRows", []);
+  ensureState("storyTop", {});
+  ensureState("globalTop", []);
+  ensureState("spread", { term: "", origin: null, later: [] });
+  ensureState("loading", false);
+  ensureState("lastError", null);
 
-  /* ---------- tiny event system (mirrors to window CustomEvents) ---------- */
-  var listeners = app._events;
-  if (!listeners || typeof listeners !== "object") { listeners = {}; app._events = listeners; }
+  /* ---------- tiny event system: on / off / emit ----------
+     emit also dispatches a window CustomEvent with the same
+     name and detail so iframe hosts can listen via
+     window.addEventListener. */
+  var listeners = app._listeners || {};
+  app._listeners = listeners;
 
   app.on = function (name, fn) {
-    if (typeof fn !== "function") { return app; }
-    var key = String(name);
-    if (!listeners[key]) { listeners[key] = []; }
-    listeners[key].push(fn);
-    return app;
+    if (typeof fn !== "function") { return function () {}; }
+    var bucket = listeners[name];
+    if (!bucket) { bucket = listeners[name] = []; }
+    bucket.push(fn);
+    return function () { app.off(name, fn); };
   };
 
   app.off = function (name, fn) {
-    var key = String(name);
-    if (!listeners[key]) { return app; }
-    if (typeof fn !== "function") { listeners[key] = []; return app; }
-    var kept = [];
-    for (var i = 0; i < listeners[key].length; i++) {
-      if (listeners[key][i] !== fn) { kept.push(listeners[key][i]); }
+    var bucket = listeners[name];
+    if (!bucket) { return; }
+    if (fn === undefined) { listeners[name] = []; return; }
+    for (var i = bucket.length - 1; i >= 0; i--) {
+      if (bucket[i] === fn) { bucket.splice(i, 1); }
     }
-    listeners[key] = kept;
-    return app;
   };
 
   app.emit = function (name, detail) {
-    var key = String(name);
-    var queue = listeners[key] ? listeners[key].slice() : [];
-    for (var i = 0; i < queue.length; i++) {
-      try { queue[i].call(app, detail, key); }
-      catch (err) {
-        if (typeof console !== "undefined" && console.error) {
-          console.error("[hn-emoji-lens] listener failed for '" + key + "'", err);
+    var bucket = listeners[name];
+    if (bucket && bucket.length > 0) {
+      var snapshot = bucket.slice();
+      for (var i = 0; i < snapshot.length; i++) {
+        try { snapshot[i](detail); } catch (err) {
+          if (w.console && w.console.error) {
+            w.console.error("[sentiment] listener error on " + name, err);
+          }
         }
       }
     }
     try {
-      w.dispatchEvent(new CustomEvent(key, { detail: detail }));
-    } catch (errModern) {
-      try {
-        var legacy = document.createEvent("CustomEvent");
-        legacy.initCustomEvent(key, false, false, detail);
-        w.dispatchEvent(legacy);
-      } catch (errLegacy) { /* CustomEvent unsupported */ }
-    }
-    return app;
+      var evt;
+      if (typeof w.CustomEvent === "function") {
+        evt = new w.CustomEvent(name, { detail: detail });
+      } else {
+        evt = document.createEvent("CustomEvent");
+        evt.initCustomEvent(name, false, false, detail);
+      }
+      w.dispatchEvent(evt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return detail;
   };
 
-  /* ---------- shared helpers ---------- */
-  function normalizeText(text) {
-    return String(text === null || text === undefined ? "" : text)
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, " ");
-  }
+  /* ---------- cache: in-memory Map + localStorage persistence ----------
+     get/set are promise friendly (await works on their return
+     values) but resolve synchronously whenever possible. */
+  var memory = new Map();
 
   function stableHash(text) {
     var s = String(text === null || text === undefined ? "" : text);
@@ -472,207 +477,226 @@
     var h2 = 52711;
     for (var i = 0; i < s.length; i++) {
       var c = s.charCodeAt(i);
-      h1 = ((h1 * 33) ^ c) >>> 0;
-      h2 = ((h2 * 31) ^ c) >>> 0;
+      h1 = (((h1 << 5) + h1) + c) | 0;
+      h2 = (((h2 << 5) + h2) ^ c) | 0;
     }
-    return h1.toString(36) + h2.toString(36);
+    return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36);
   }
 
-  /* ---------- cache: in-memory Map + localStorage persistence ---------- */
-  var memCache = new Map();
+  function normalizeText(text) {
+    return String(text === null || text === undefined ? "" : text)
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/^\s+|\s+$/g, "");
+  }
 
-  function storageRead(key) {
-    var out = { found: false, value: undefined };
+  function readStored(key) {
     try {
-      var raw = w.localStorage.getItem(cfg.cachePrefix + key);
-      if (raw !== null && raw !== undefined) {
-        out.found = true;
-        out.value = JSON.parse(raw);
-      }
-    } catch (eRead) { /* storage unavailable or corrupt entry */ }
-    return out;
+      var ls = w.localStorage;
+      if (!ls) { return { found: false, value: null }; }
+      var raw = ls.getItem(key);
+      if (raw === null || raw === undefined) { return { found: false, value: null }; }
+      return { found: true, value: JSON.parse(raw) };
+    } catch (err) {
+      return { found: false, value: null };
+    }
   }
 
-  function storageWrite(key, value) {
+  function writeStored(key, value) {
     try {
-      w.localStorage.setItem(cfg.cachePrefix + key, JSON.stringify(value));
-      return true;
-    } catch (eWrite) { return false; }
+      var ls = w.localStorage;
+      if (ls) { ls.setItem(key, JSON.stringify(value)); }
+    } catch (err) { /* storage unavailable or full; memory copy survives */ }
   }
 
-  function storageHas(key) {
-    try { return w.localStorage.getItem(cfg.cachePrefix + key) !== null; }
-    catch (eHas) { return false; }
-  }
-
-  /* get / set / has / clear return plain values synchronously, so they are
-     safe to call directly or behind await / Promise.resolve(). */
   app.cache = {
-    _mem: memCache,
+    memory: memory,
     stableHash: stableHash,
     makeKey: function (text) {
-      return "k:" + stableHash(normalizeText(text));
+      return app.config.cachePrefix + stableHash(normalizeText(text));
     },
     get: function (key) {
-      var k = String(key);
-      if (memCache.has(k)) { return memCache.get(k); }
-      var hit = storageRead(k);
-      if (hit.found) { memCache.set(k, hit.value); return hit.value; }
-      return undefined;
+      if (memory.has(key)) { return memory.get(key); }
+      var stored = readStored(key);
+      if (stored.found) {
+        memory.set(key, stored.value);
+        return stored.value;
+      }
+      return null;
     },
     set: function (key, value) {
-      var k = String(key);
-      memCache.set(k, value);
-      storageWrite(k, value);
+      if (value && typeof value.then === "function") {
+        return value.then(function (resolved) {
+          memory.set(key, resolved);
+          writeStored(key, resolved);
+          return resolved;
+        });
+      }
+      memory.set(key, value);
+      writeStored(key, value);
       return value;
     },
     has: function (key) {
-      var k = String(key);
-      return memCache.has(k) || storageHas(k);
+      if (memory.has(key)) { return true; }
+      return readStored(key).found;
     },
     clear: function () {
-      memCache.clear();
+      memory.clear();
       try {
+        var ls = w.localStorage;
+        if (!ls) { return; }
+        var prefix = app.config.cachePrefix;
         var doomed = [];
-        for (var i = 0; i < w.localStorage.length; i++) {
-          var full = w.localStorage.key(i);
-          if (full && full.indexOf(cfg.cachePrefix) === 0) { doomed.push(full); }
+        for (var i = 0; i < ls.length; i++) {
+          var k = ls.key(i);
+          if (k !== null && k.indexOf(prefix) === 0) { doomed.push(k); }
         }
-        for (var j = 0; j < doomed.length; j++) { w.localStorage.removeItem(doomed[j]); }
-      } catch (eClear) { /* storage unavailable */ }
-      return true;
+        for (var j = 0; j < doomed.length; j++) { ls.removeItem(doomed[j]); }
+      } catch (err) { /* storage unavailable */ }
     }
   };
 
-  /* ---------- placeholder public methods (later chains replace in place) ---------- */
-  var placeholderNames = [
+  /* ---------- util ---------- */
+  function pad2(n) {
+    n = String(n);
+    return n.length < 2 ? "0" + n : n;
+  }
+
+  app.util = {
+    localDateString: function (date) {
+      var d = date instanceof Date ? date : new Date();
+      return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+    },
+    toUnixSeconds: function (value) {
+      if (value === null || value === undefined || value === "") { return null; }
+      if (typeof value === "number" && isFinite(value)) {
+        return Math.floor(value); /* already seconds */
+      }
+      var d;
+      if (value instanceof Date) {
+        d = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0);
+      } else {
+        var parts = String(value).split("-");
+        if (parts.length !== 3) { return null; }
+        var y = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10);
+        var day = parseInt(parts[2], 10);
+        if (isNaN(y) || isNaN(m) || isNaN(day)) { return null; }
+        d = new Date(y, m - 1, day, 0, 0, 0, 0); /* local midnight */
+      }
+      return Math.floor(d.getTime() / 1000);
+    },
+    endOfDayUnixSeconds: function (value) {
+      var start = app.util.toUnixSeconds(value);
+      if (start === null) { return null; }
+      /* inclusive: 23:59:59 of that day; exclusive: next local midnight */
+      return app.config.dateEndInclusive ? start + 86399 : start + 86400;
+    },
+    escapeHtml: function (text) {
+      return String(text === null || text === undefined ? "" : text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    },
+    clamp: function (value, min, max) {
+      var n = Number(value);
+      if (isNaN(n)) { n = min; }
+      if (n < min) { return min; }
+      if (n > max) { return max; }
+      return n;
+    },
+    sortEmojiCounts: function (list) {
+      /* accepts [{emoji,count}], [[emoji,count]], or {emoji:count};
+         returns a new array sorted by count desc, ties broken by the
+         fixed emoji set order, unknown emojis last (stable). */
+      var entries = [];
+      var i;
+      if (list === null || list === undefined) { return []; }
+      if (Object.prototype.toString.call(list) === "[object Array]") {
+        for (i = 0; i < list.length; i++) { entries.push(list[i]); }
+      } else if (typeof list === "object") {
+        for (var k in list) {
+          if (Object.prototype.hasOwnProperty.call(list, k)) {
+            entries.push({ emoji: k, count: list[k] });
+          }
+        }
+      }
+      var order = {};
+      for (i = 0; i < app.emojiSet.length; i++) {
+        if (!(app.emojiSet[i] in order)) { order[app.emojiSet[i]] = i; }
+      }
+      var wrapped = [];
+      for (i = 0; i < entries.length; i++) {
+        var item = entries[i];
+        var emoji;
+        var count;
+        if (item !== null && typeof item === "object" &&
+            Object.prototype.toString.call(item) !== "[object Array]" &&
+            ("emoji" in item || "count" in item)) {
+          emoji = item.emoji;
+          count = item.count;
+        } else if (Object.prototype.toString.call(item) === "[object Array]") {
+          emoji = item[0];
+          count = item[1];
+        } else {
+          emoji = item;
+          count = 0;
+        }
+        wrapped.push({ item: item, emoji: emoji, count: Number(count) || 0, idx: i });
+      }
+      wrapped.sort(function (a, b) {
+        if (b.count !== a.count) { return b.count - a.count; }
+        var oa = (a.emoji in order) ? order[a.emoji] : app.emojiSet.length + a.idx;
+        var ob = (b.emoji in order) ? order[b.emoji] : app.emojiSet.length + b.idx;
+        return oa - ob;
+      });
+      var out = [];
+      for (i = 0; i < wrapped.length; i++) { out.push(wrapped[i].item); }
+      return out;
+    },
+    debounce: function (fn, wait) {
+      var timer = null;
+      var delay = typeof wait === "number" ? wait : 200;
+      function debounced() {
+        var self = this;
+        var args = arguments;
+        if (timer !== null) { clearTimeout(timer); }
+        timer = setTimeout(function () {
+          timer = null;
+          fn.apply(self, args);
+        }, delay);
+      }
+      debounced.cancel = function () {
+        if (timer !== null) { clearTimeout(timer); timer = null; }
+      };
+      return debounced;
+    }
+  };
+
+  /* ---------- placeholder public methods ----------
+     Later chains replace these in place on the same object. */
+  var PLACEHOLDER_METHODS = [
     "loadRange", "reload", "setRange", "loadComments", "classifyText",
     "renderAll", "expandStory", "collapseStory", "searchSpread", "exportPNG"
   ];
-
-  function buildPlaceholder(methodName) {
-    return function () {
-      st.lastError = "app." + methodName + "() is not wired yet — v0 namespace placeholder; a later chain must implement it.";
-      app.emit("sentiment:error", { method: methodName });
-      return null;
-    };
+  for (var pi = 0; pi < PLACEHOLDER_METHODS.length; pi++) {
+    (function (methodName) {
+      if (typeof app[methodName] !== "function") {
+        app[methodName] = function () {
+          app.state.lastError = "app." + methodName + " is not wired yet";
+          app.emit("sentiment:error", { method: methodName });
+          return null;
+        };
+      }
+    })(PLACEHOLDER_METHODS[pi]);
   }
-
-  for (var pi = 0; pi < placeholderNames.length; pi++) {
-    if (typeof app[placeholderNames[pi]] !== "function") {
-      app[placeholderNames[pi]] = buildPlaceholder(placeholderNames[pi]);
-    }
-  }
-
-  /* ---------- utilities ---------- */
-  var HTML_ESCAPES = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  };
-
-  var util = {};
-
-  util.toUnixSeconds = function (value) {
-    if (value === null || value === undefined || value === "") { return null; }
-    var ms = NaN;
-    if (value instanceof Date) {
-      ms = value.getTime();
-    } else if (typeof value === "number" && isFinite(value)) {
-      ms = value > 100000000000 ? value : value * 1000;
-    } else {
-      var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(String(value).trim());
-      if (m) {
-        ms = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-      } else {
-        ms = Date.parse(String(value));
-      }
-    }
-    if (isNaN(ms)) { return null; }
-    return Math.floor(ms / 1000);
-  };
-
-  util.endOfDayUnixSeconds = function (value) {
-    var start = util.toUnixSeconds(value);
-    if (start === null) { return null; }
-    return cfg.dateEndInclusive ? start + 86399 : start;
-  };
-
-  util.escapeHtml = function (text) {
-    return String(text === null || text === undefined ? "" : text)
-      .replace(/[&<>"']/g, function (ch) { return HTML_ESCAPES[ch]; });
-  };
-
-  util.clamp = function (n, min, max) {
-    var num = Number(n);
-    if (isNaN(num)) { num = min; }
-    if (num < min) { return min; }
-    if (num > max) { return max; }
-    return num;
-  };
-
-  util.sortEmojiCounts = function (counts) {
-    var entries = [];
-    var i;
-    var key;
-    if (counts instanceof Map) {
-      counts.forEach(function (count, emoji) {
-        entries.push({ emoji: emoji, count: Number(count) || 0 });
-      });
-    } else if (Array.isArray(counts)) {
-      for (i = 0; i < counts.length; i++) {
-        var item = counts[i];
-        if (Array.isArray(item)) {
-          entries.push({ emoji: item[0], count: Number(item[1]) || 0 });
-        } else if (item && typeof item === "object") {
-          entries.push({ emoji: item.emoji, count: Number(item.count) || 0 });
-        }
-      }
-    } else if (counts && typeof counts === "object") {
-      for (key in counts) {
-        if (Object.prototype.hasOwnProperty.call(counts, key)) {
-          entries.push({ emoji: key, count: Number(counts[key]) || 0 });
-        }
-      }
-    }
-    var order = {};
-    for (i = 0; i < app.emojis.length; i++) {
-      if (order[app.emojis[i]] === undefined) { order[app.emojis[i]] = i; }
-    }
-    entries.sort(function (a, b) {
-      if (b.count !== a.count) { return b.count - a.count; }
-      var ai = order[a.emoji] !== undefined ? order[a.emoji] : app.emojis.length;
-      var bi = order[b.emoji] !== undefined ? order[b.emoji] : app.emojis.length;
-      if (ai !== bi) { return ai - bi; }
-      if (a.emoji < b.emoji) { return -1; }
-      if (a.emoji > b.emoji) { return 1; }
-      return 0;
-    });
-    return entries;
-  };
-
-  util.debounce = function (fn, wait) {
-    var delay = typeof wait === "number" && isFinite(wait) ? wait : 200;
-    var timer = null;
-    return function () {
-      var self = this;
-      var args = arguments;
-      if (timer !== null) { clearTimeout(timer); }
-      timer = setTimeout(function () {
-        timer = null;
-        fn.apply(self, args);
-      }, delay);
-    };
-  };
-
-  app.util = util;
 
   /* ---------- console friendly alias ---------- */
   w.hnEmoji = app;
 
-  /* ---------- announce ---------- */
+  /* ---------- announce namespace ---------- */
   app.emit("sentiment:namespace", app);
 })();
 </script><script>
@@ -681,171 +705,739 @@
 
   var w = window;
 
-  /* ---------- resolve shared namespace; bail out if missing ---------- */
-  var app = null;
-  if (w.sentiment && typeof w.sentiment === "object" && w.sentiment.hackernews && typeof w.sentiment.hackernews === "object") {
-    app = w.sentiment.hackernews;
-  }
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
   if (!app) {
     try {
-      w.dispatchEvent(new CustomEvent("sentiment:error", {
-        detail: { method: "loadRange", error: "window.sentiment.hackernews namespace is missing" }
-      }));
-    } catch (eMissing) { /* cannot announce */ }
+      var errEvt;
+      var errDetail = { method: "init", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
     return;
   }
   w.hnEmoji = app;
-  var hnEmoji = app;
-
-  var st = app.state;
-  var cfg = app.config;
-  var util = app.util;
 
   /* ---------- element handles ---------- */
-  function byId(id) { return document.getElementById(id); }
-
-  var statusEl = byId("status");
-  var startInput = byId("start-date");
-  var endInput = byId("end-date");
-  var submitBtn = byId("submit-btn");
+  var startInput = document.getElementById("start-date");
+  var endInput = document.getElementById("end-date");
+  var submitBtn = document.getElementById("submit-btn");
+  var statusEl = document.getElementById("status");
+  var topbar = document.getElementById("topbar");
 
   function setStatus(message) {
     if (statusEl) { statusEl.textContent = message; }
   }
 
-  var HN_ITEM_BASE = "https://news.ycombinator.com/item";
+  /* ---------- never allow a native submit / page reload from the header ---------- */
+  if (topbar) {
+    topbar.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+    });
+  }
+
+  /* ---------- default dates early, but never auto submit ---------- */
+  if (startInput && !startInput.value) {
+    var weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    startInput.value = app.util.localDateString(weekAgo);
+  }
+  if (endInput && !endInput.value) {
+    endInput.value = app.util.localDateString(new Date());
+  }
+  setStatus("ready");
 
   /* ---------- hit normalization ---------- */
   function normalizeHit(hit) {
     var id = String(hit.objectID);
-    var hnParams = new URLSearchParams();
-    hnParams.set("id", id);
-    var points = Number(hit.points) || 0;
+    var points = hit.points || 0;
+    var hn = new URL("https://news.ycombinator.com/item");
+    hn.searchParams.set("id", id);
     return {
       id: id,
-      title: hit.title || "",
-      url: hit.url || "",
-      hnUrl: HN_ITEM_BASE + "?" + hnParams.toString(),
+      title: hit.title,
+      url: hit.url,
+      hnUrl: hn.toString(),
       points: points,
-      numComments: Number(hit.num_comments) || 0,
-      author: hit.author || "",
+      numComments: hit.num_comments || 0,
+      author: hit.author,
       createdAt: hit.created_at_i,
       storyText: hit.story_text || "",
-      frontPage: points >= cfg.frontPageMinPoints,
+      frontPage: points >= app.config.frontPageMinPoints,
       raw: hit
     };
   }
 
-  /* ---------- app.loadRange (replaced in place) ---------- */
-  app.loadRange = async function loadRange(startValue, endValue) {
-    st.loading = true;
-    st.lastError = null;
+  /* ---------- app.loadRange: fetch stories for a date range ---------- */
+  app.loadRange = async function (startValue, endValue) {
+    app.state.loading = true;
+    app.state.lastError = null;
     setStatus("loading stories");
     app.emit("sentiment:stories-loading", { start: startValue, end: endValue });
+
+    /* mutate range in place; clear old stories so a rerun clears old cards */
+    app.state.range.start = startValue;
+    app.state.range.end = endValue;
+    app.state.stories = [];
+
     try {
-      var startUnix = util.toUnixSeconds(startValue);
-      var endUnix = util.endOfDayUnixSeconds(endValue);
+      var startUnix = app.util.toUnixSeconds(startValue);
+      var endUnix = app.util.endOfDayUnixSeconds(endValue);
       if (startUnix === null || endUnix === null) {
         throw new Error("invalid date range");
       }
 
-      var url = new URL("search_by_date", cfg.algoliaBase);
-      var sp = url.searchParams;
-      sp.set("tags", cfg.storyTag);
-      sp.set("numericFilters", "created_at_i>" + startUnix + ",created_at_i<" + endUnix);
+      var url = new URL(app.config.algoliaBase + "search_by_date");
+      url.searchParams.set("tags", app.config.storyTag);
+      url.searchParams.set(
+        "numericFilters",
+        "created_at_i>" + startUnix + ",created_at_i<" + endUnix
+      );
 
-      var collected = [];
       var page = 0;
-      var nbPages = 1;
-      while (collected.length < cfg.maxStories && page < nbPages) {
-        sp.set("page", String(page));
-        var resp = await fetch(url.toString(), { method: "GET" });
-        if (!resp.ok) { throw new Error("request failed: HTTP " + resp.status); }
-        var data = await resp.json();
-        var hits = (data && Array.isArray(data.hits)) ? data.hits : [];
-        nbPages = (data && typeof data.nbPages === "number") ? data.nbPages : 0;
-        for (var i = 0; i < hits.length; i++) {
-          collected.push(normalizeHit(hits[i]));
+      while (app.state.stories.length < app.config.maxStories) {
+        url.searchParams.set("page", String(page));
+
+        var response = await fetch(url.toString(), { method: "GET" });
+        if (!response.ok) {
+          throw new Error("request failed: HTTP " + response.status);
         }
-        page += 1;
-      }
-      if (collected.length > cfg.maxStories) {
-        collected = collected.slice(0, cfg.maxStories);
+        var data = await response.json();
+        var hits = (data && data.hits) || [];
+
+        for (var i = 0; i < hits.length; i++) {
+          var story = normalizeHit(hits[i]);
+          app.state.stories.push(story);
+          app.emit("sentiment:story", story);
+        }
+
+        setStatus(
+          app.state.stories.length + " stories · " + startValue + " → " + endValue
+        );
+
+        var currentPage = (data && typeof data.page === "number") ? data.page : page;
+        var morePages = (data && typeof data.nbPages === "number")
+          ? (currentPage + 1 < data.nbPages)
+          : false;
+
+        page++;
+        if (!morePages || hits.length === 0) { break; }
       }
 
-      st.range.start = startValue;
-      st.range.end = endValue;
-      st.stories = collected;
-
-      setStatus("loaded " + collected.length + " stories (" + startValue + " – " + endValue + ")");
-      app.emit("sentiment:stories", st.stories);
-      return st.stories;
+      app.emit("sentiment:stories", app.state.stories);
     } catch (err) {
       var message = (err && err.message) ? err.message : String(err);
-      st.lastError = message;
+      app.state.lastError = message;
       setStatus(message);
       app.emit("sentiment:error", { method: "loadRange", error: message });
-      return null;
-    } finally {
-      st.loading = false;
     }
+
+    app.state.loading = false;
+    return app.state.stories;
   };
 
-  /* ---------- app.setRange (replaced in place) ---------- */
-  app.setRange = function setRange(startValue, endValue) {
-    if (startValue !== undefined && startInput) { startInput.value = startValue; }
-    if (endValue !== undefined && endInput) { endInput.value = endValue; }
-    var s = startInput ? startInput.value : (startValue || null);
-    var e = endInput ? endInput.value : (endValue || null);
-    st.range.start = s || null;
-    st.range.end = e || null;
-    return st.range;
+  /* ---------- app.setRange: write inputs, mutate state, return range ---------- */
+  app.setRange = function (startValue, endValue) {
+    if (startInput && startValue !== undefined) { startInput.value = startValue; }
+    if (endInput && endValue !== undefined) { endInput.value = endValue; }
+    app.state.range.start = startInput ? startInput.value : startValue;
+    app.state.range.end = endInput ? endInput.value : endValue;
+    return app.state.range;
   };
 
-  /* ---------- app.reload (replaced in place) ---------- */
-  app.reload = function reload() {
-    return app.loadRange(st.range.start, st.range.end);
+  /* ---------- app.reload: rerun with current range ---------- */
+  app.reload = function () {
+    return app.loadRange(app.state.range.start, app.state.range.end);
   };
 
-  /* ---------- header control wiring (no native submit / reload) ---------- */
-  function runFromInputs(ev) {
-    if (ev && typeof ev.preventDefault === "function") { ev.preventDefault(); }
-    var s = startInput ? startInput.value : "";
-    var e = endInput ? endInput.value : "";
-    app.loadRange(s, e);
-  }
-
-  function onDateKeydown(ev) {
-    if (ev && (ev.key === "Enter" || ev.keyCode === 13)) {
-      runFromInputs(ev);
-    }
+  /* ---------- header wiring ---------- */
+  function runFromInputs() {
+    var startValue = startInput ? startInput.value : "";
+    var endValue = endInput ? endInput.value : "";
+    app.loadRange(startValue, endValue);
   }
 
   if (submitBtn) {
-    submitBtn.addEventListener("click", runFromInputs);
-  }
-  if (startInput) {
-    startInput.addEventListener("keydown", onDateKeydown);
-  }
-  if (endInput) {
-    endInput.addEventListener("keydown", onDateKeydown);
-  }
-
-  var hostForm = null;
-  if (submitBtn && submitBtn.form) { hostForm = submitBtn.form; }
-  if (!hostForm && startInput && startInput.form) { hostForm = startInput.form; }
-  if (!hostForm && endInput && endInput.form) { hostForm = endInput.form; }
-  if (hostForm) {
-    hostForm.addEventListener("submit", function (ev) {
-      if (ev && typeof ev.preventDefault === "function") { ev.preventDefault(); }
+    submitBtn.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      runFromInputs();
     });
   }
 
-  /* ---------- initial run ---------- */
-  if (startInput && endInput && startInput.value && endInput.value) {
-    app.loadRange(startInput.value, endInput.value);
-  } else {
-    setStatus("pick a date range");
+  function onEnterKey(ev) {
+    var key = ev.key || ev.keyCode;
+    if (key === "Enter" || key === 13) {
+      ev.preventDefault();
+      runFromInputs();
+    }
   }
+  if (startInput) { startInput.addEventListener("keydown", onEnterKey); }
+  if (endInput) { endInput.addEventListener("keydown", onEnterKey); }
+
+  /* intentionally no auto-load on script init */
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "loadComments", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  var statusEl = document.getElementById("status");
+
+  function setStatus(message) {
+    if (statusEl) { statusEl.textContent = message; }
+  }
+
+  /* ---------- app.loadComments: fetch full item tree per story,
+     flatten top-level comments into global rows ---------- */
+  app.loadComments = async function (stories) {
+    if (stories === undefined || stories === null) { stories = app.state.stories; }
+    if (!stories || typeof stories.length !== "number" || stories.length === 0) {
+      setStatus("no stories to scan");
+      return [];
+    }
+
+    app.state.loading = true;
+    app.state.lastError = null;
+
+    /* reset derived comment state before fetching */
+    app.state.commentRows = [];
+    app.state.storyTop = {};
+    app.state.globalTop = [];
+
+    var total = stories.length;
+    setStatus("loading comments 0 of " + total);
+    app.emit("sentiment:comments-loading", { count: total });
+
+    for (var i = 0; i < stories.length; i++) {
+      var story = stories[i];
+      try {
+        var response = await fetch(app.config.algoliaBase + "items/" + story.id, { method: "GET" });
+        if (!response.ok) {
+          throw new Error("request failed: HTTP " + response.status);
+        }
+        var item = await response.json();
+        var children = (item && item.children) || [];
+
+        /* order comments by createdAt ascending inside this story */
+        var sorted = children.slice();
+        sorted.sort(function (a, b) {
+          return ((a && a.created_at_i) || 0) - ((b && b.created_at_i) || 0);
+        });
+
+        for (var j = 0; j < sorted.length; j++) {
+          var child = sorted[j] || {};
+          var row = {
+            storyId: story.id,
+            storyTitle: story.title,
+            storyUrl: story.url,
+            hnUrl: story.hnUrl,
+            storyPoints: story.points,
+            storyCreatedAt: story.createdAt,
+            commentId: String(child.id),
+            author: child.author || "",
+            text: child.text || "",
+            createdAt: child.created_at_i || 0,
+            replyCount: (child.children && child.children.length) || 0,
+            emoji: null,
+            raw: child
+          };
+          app.state.commentRows.push(row);
+          app.emit("sentiment:comment-row", row);
+        }
+      } catch (err) {
+        var message = (err && err.message) ? err.message : String(err);
+        app.state.lastError = message;
+        app.emit("sentiment:error", { method: "loadComments", storyId: story.id, error: message });
+        /* continue with the next story */
+      }
+
+      setStatus("loading comments " + (i + 1) + " of " + total);
+      app.emit("sentiment:comments-progress", {
+        done: i + 1,
+        total: total,
+        rows: app.state.commentRows.length
+      });
+    }
+
+    app.state.loading = false;
+    setStatus(app.state.commentRows.length + " comment rows loaded");
+    app.emit("sentiment:comments", app.state.commentRows);
+    return app.state.commentRows;
+  };
+
+  /* ---------- auto-pull comments after a fresh date run ---------- */
+  app.on("sentiment:stories", function (detail) {
+    app.loadComments(detail);
+  });
+
+  /* ---------- repeated runs: clear derived state before new fetches ---------- */
+  app.on("sentiment:stories-loading", function () {
+    app.state.commentRows = [];
+    app.state.storyTop = {};
+    app.state.globalTop = [];
+  });
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "render", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- constants + element handles ---------- */
+  var PENDING_EMOJI = "⏳️";
+  var PENDING_LABEL = "pending";
+
+  var storyListEl = document.getElementById("story-list");
+  var summaryEl = document.getElementById("global-emoji-summary");
+  var summaryTitleEl = summaryEl ? summaryEl.querySelector(".summary-title") : null;
+  var globalSlots = summaryEl ? summaryEl.querySelectorAll(".global-emoji-slot") : [];
+  var globalCounts = summaryEl ? summaryEl.querySelectorAll(".global-emoji-count") : [];
+  var statusEl = document.getElementById("status");
+  var storyTemplate = document.getElementById("story-row-template");
+  var commentTemplate = document.getElementById("comment-row-template");
+
+  /* ---------- local render registry: story id -> rendered card element ---------- */
+  var cardById = new Map();
+
+  /* ---------- expanded set: lives on app.state, always mutated in place ---------- */
+  function expandedSet() {
+    var set = app.state._expanded;
+    if (!set || typeof set.has !== "function" || typeof set.add !== "function") {
+      set = new Set();
+      app.state._expanded = set;
+    }
+    return set;
+  }
+  expandedSet();
+
+  /* ---------- small helpers ---------- */
+  function formatCreated(unixSeconds) {
+    if (!unixSeconds) { return "unknown date"; }
+    return app.util.localDateString(new Date(unixSeconds * 1000));
+  }
+
+  function storyLoadedCount(storyId) {
+    var rows = app.state.commentRows || [];
+    var n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i].storyId) === String(storyId)) { n++; }
+    }
+    return n;
+  }
+
+  /* normalize storyTop / globalTop entries into [{emoji,count}] (max 3),
+     returning null when there is nothing classified yet */
+  function normalizeTopEntries(top) {
+    if (!top) { return null; }
+    var sorted = app.util.sortEmojiCounts(top);
+    var out = [];
+    for (var i = 0; i < sorted.length && out.length < 3; i++) {
+      var item = sorted[i];
+      var emoji = null;
+      var count = 0;
+      if (item !== null && typeof item === "object" &&
+          Object.prototype.toString.call(item) !== "[object Array]") {
+        emoji = item.emoji;
+        count = Number(item.count) || 0;
+      } else if (Object.prototype.toString.call(item) === "[object Array]") {
+        emoji = item[0];
+        count = Number(item[1]) || 0;
+      }
+      if (emoji) { out.push({ emoji: emoji, count: count }); }
+    }
+    return out.length > 0 ? out : null;
+  }
+
+  /* ---------- global summary strip ---------- */
+  function renderGlobalSummary() {
+    var rows = app.state.commentRows || [];
+    if (summaryTitleEl) {
+      summaryTitleEl.textContent = "All comments: " + rows.length;
+    }
+    var top = normalizeTopEntries(app.state.globalTop);
+    for (var i = 0; i < globalSlots.length; i++) {
+      var entry = top && i < top.length ? top[i] : null;
+      globalSlots[i].textContent = entry ? entry.emoji : PENDING_EMOJI;
+      if (globalCounts[i]) {
+        globalCounts[i].textContent = entry ? String(entry.count) : PENDING_LABEL;
+      }
+    }
+  }
+
+  /* ---------- empty / loading messages for the story list ---------- */
+  var emptyEl = null;
+  function showListMessage(text) {
+    if (!storyListEl) { return; }
+    if (!emptyEl) {
+      emptyEl = document.createElement("p");
+      emptyEl.className = "spread-empty";
+    }
+    emptyEl.textContent = text;
+    if (emptyEl.parentNode !== storyListEl) { storyListEl.appendChild(emptyEl); }
+  }
+  function clearListMessage() {
+    if (emptyEl && emptyEl.parentNode) { emptyEl.parentNode.removeChild(emptyEl); }
+  }
+  function updateEmptyState() {
+    var has = app.state.stories && app.state.stories.length > 0;
+    if (has) { clearListMessage(); }
+    else { showListMessage("No stories to show. Pick a date range above and press Run."); }
+  }
+
+  /* ---------- card part renderers (textContent / escaped only) ---------- */
+  function renderCardMeta(card, story) {
+    var metaEl = card.querySelector(".story-meta");
+    if (!metaEl) { return; }
+    metaEl.textContent = "";
+    var parts = [];
+    parts.push((story.points || 0) + " points");
+    parts.push("by " + (story.author || "anonymous"));
+    var commentsPart = (story.numComments || 0) + " comments";
+    var loaded = storyLoadedCount(story.id);
+    if (loaded > 0) { commentsPart += " (" + loaded + " loaded)"; }
+    parts.push(commentsPart);
+    parts.push(formatCreated(story.createdAt));
+    metaEl.appendChild(document.createTextNode(parts.join(" · ")));
+    if (story.frontPage) {
+      var badge = document.createElement("span");
+      badge.className = "frontpage-badge";
+      badge.textContent = "front page";
+      badge.style.color = "#ff6600";
+      badge.style.border = "1px solid #ff6600";
+      badge.style.borderRadius = "999px";
+      badge.style.padding = "0 6px";
+      badge.style.marginLeft = "6px";
+      badge.style.fontSize = "10px";
+      badge.style.fontWeight = "700";
+      badge.style.letterSpacing = ".05em";
+      badge.style.textTransform = "uppercase";
+      metaEl.appendChild(badge);
+    }
+  }
+
+  function fillStorySlot(slotEl, entry) {
+    slotEl.textContent = "";
+    slotEl.appendChild(document.createTextNode(entry ? entry.emoji : PENDING_EMOJI));
+    var countEl = document.createElement("span");
+    countEl.className = "story-emoji-count";
+    countEl.textContent = entry ? String(entry.count) : PENDING_LABEL;
+    slotEl.appendChild(countEl);
+  }
+
+  function renderCardSlots(card, story) {
+    var slots = card.querySelectorAll(".story-emoji-slot");
+    var top = normalizeTopEntries(app.state.storyTop ? app.state.storyTop[story.id] : null);
+    for (var i = 0; i < slots.length; i++) {
+      fillStorySlot(slots[i], top && i < top.length ? top[i] : null);
+    }
+  }
+
+  function renderCommentRow(row) {
+    if (!commentTemplate) { return null; }
+    var node = commentTemplate.content.firstElementChild.cloneNode(true);
+
+    var emojiEl = node.querySelector(".comment-emoji");
+    if (emojiEl) { emojiEl.textContent = row.emoji || PENDING_EMOJI; }
+
+    var authorEl = node.querySelector(".comment-author");
+    if (authorEl) { authorEl.textContent = row.author || "anonymous"; }
+
+    var textEl = node.querySelector(".comment-text");
+    if (textEl) {
+      textEl.textContent = "";
+      /* escaped text, basic line breaks preserved: paragraph / br tags and
+         newlines become visible breaks, everything else stays escaped */
+      var raw = row.text === null || row.text === undefined ? "" : String(row.text);
+      raw = raw.replace(/<p\s*\/?>/gi, "\n").replace(/<br\s*\/?>/gi, "\n");
+      var lines = raw.split(/\r\n|\r|\n/);
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < lines.length; i++) {
+        if (i > 0) { frag.appendChild(document.createElement("br")); }
+        frag.appendChild(document.createTextNode(lines[i]));
+      }
+      if (row.replyCount > 0) {
+        var replies = document.createElement("span");
+        replies.className = "comment-replies";
+        replies.textContent = "  · " + row.replyCount + (row.replyCount === 1 ? " reply" : " replies");
+        replies.style.color = "#8b949e";
+        replies.style.fontSize = "11px";
+        frag.appendChild(replies);
+      }
+      textEl.appendChild(frag);
+    }
+    return node;
+  }
+
+  function renderCommentsInto(commentsEl, storyId) {
+    commentsEl.textContent = "";
+    var rows = app.state.commentRows || [];
+    var frag = document.createDocumentFragment();
+    var count = 0;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i].storyId) === String(storyId)) {
+        var node = renderCommentRow(rows[i]);
+        if (node) { frag.appendChild(node); count++; }
+      }
+    }
+    if (count === 0) {
+      var note = document.createElement("p");
+      note.className = "spread-empty comments-empty";
+      note.textContent = app.state.loading ? "Loading comments…" : "No top-level comments loaded.";
+      frag.appendChild(note);
+    }
+    commentsEl.appendChild(frag);
+  }
+
+  /* ---------- fill an existing card in place from app.state data ---------- */
+  function fillCard(card, story) {
+    card._story = story;
+
+    var titleEl = card.querySelector(".story-title");
+    if (titleEl) {
+      var link = document.createElement("a");
+      link.className = "story-title";
+      link.href = story.url || story.hnUrl || "#";
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = story.title || "(untitled)";
+      titleEl.parentNode.replaceChild(link, titleEl);
+    }
+
+    renderCardMeta(card, story);
+    renderCardSlots(card, story);
+
+    var isOpen = expandedSet().has(String(story.id));
+    if (isOpen) { card.classList.add("open"); }
+    else { card.classList.remove("open"); }
+    var commentsEl = card.querySelector(".story-comments");
+    if (commentsEl) {
+      if (isOpen) { renderCommentsInto(commentsEl, story.id); }
+      else { commentsEl.textContent = ""; }
+    }
+  }
+
+  /* ---------- renderStoryCard: clone template, fill, wire toggle ---------- */
+  function renderStoryCard(story) {
+    if (!storyTemplate) { return null; }
+    var card = storyTemplate.content.firstElementChild.cloneNode(true);
+    card.setAttribute("data-story-id", String(story.id));
+    fillCard(card, story);
+
+    var head = card.querySelector(".story-head");
+    if (head) {
+      head.addEventListener("click", function (ev) {
+        ev.preventDefault(); /* also stops links inside the head from navigating */
+        var set = expandedSet();
+        var id = String(story.id);
+        if (set.has(id)) { app.collapseStory(id); }
+        else { app.expandStory(id); }
+      });
+    }
+    return card;
+  }
+
+  /* ---------- update only one card's expansion state ---------- */
+  function refreshCardExpansion(storyId) {
+    var card = cardById.get(String(storyId));
+    if (!card) { return; }
+    var isOpen = expandedSet().has(String(storyId));
+    if (isOpen) { card.classList.add("open"); }
+    else { card.classList.remove("open"); }
+    var commentsEl = card.querySelector(".story-comments");
+    if (!commentsEl) { return; }
+    if (isOpen) { renderCommentsInto(commentsEl, storyId); }
+    else { commentsEl.textContent = ""; }
+  }
+
+  /* ---------- expand / collapse: mutate app.state._expanded in place ---------- */
+  app.expandStory = function expandStory(storyId) {
+    var id = String(storyId);
+    var set = expandedSet();
+    if (!set.has(id)) { set.add(id); }
+    refreshCardExpansion(id);
+    return app.state._expanded;
+  };
+
+  app.collapseStory = function collapseStory(storyId) {
+    var id = String(storyId);
+    var set = expandedSet();
+    if (set.has(id)) { set.delete(id); }
+    refreshCardExpansion(id);
+    return app.state._expanded;
+  };
+
+  /* ---------- insert a card so the list matches app.state.stories order ---------- */
+  function insertCardInOrder(card, story) {
+    if (!storyListEl) { return; }
+    var stories = app.state.stories || [];
+    var idx = -1;
+    var i;
+    for (i = 0; i < stories.length; i++) {
+      if (String(stories[i].id) === String(story.id)) { idx = i; break; }
+    }
+    var reference = null;
+    if (idx >= 0) {
+      for (i = idx + 1; i < stories.length; i++) {
+        var later = cardById.get(String(stories[i].id));
+        if (later && later.parentNode === storyListEl && later !== card) {
+          reference = later;
+          break;
+        }
+      }
+    }
+    if (reference) { storyListEl.insertBefore(card, reference); }
+    else { storyListEl.appendChild(card); }
+  }
+
+  function upsertStoryCard(story) {
+    if (!storyListEl) { return; }
+    var id = String(story.id);
+    var card = cardById.get(id);
+    if (card) {
+      fillCard(card, story);
+    } else {
+      card = renderStoryCard(story);
+      if (!card) { return; }
+      cardById.set(id, card);
+    }
+    insertCardInOrder(card, story);
+    updateEmptyState();
+  }
+
+  /* ---------- reconcile the full list against app.state.stories ---------- */
+  function reconcileStoryList() {
+    if (!storyListEl) { return; }
+    var stories = app.state.stories || [];
+    var seen = {};
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < stories.length; i++) {
+      var story = stories[i];
+      if (!story) { continue; }
+      var id = String(story.id);
+      seen[id] = true;
+      var card = cardById.get(id);
+      if (card) { fillCard(card, story); }
+      else {
+        card = renderStoryCard(story);
+        if (card) { cardById.set(id, card); }
+      }
+      if (card) { frag.appendChild(card); } /* moves existing nodes into order */
+    }
+    cardById.forEach(function (oldCard, oldId) {
+      if (!seen[oldId]) {
+        if (oldCard.parentNode) { oldCard.parentNode.removeChild(oldCard); }
+        cardById.delete(oldId);
+      }
+    });
+    storyListEl.appendChild(frag);
+    updateEmptyState();
+  }
+
+  /* ---------- app.renderAll: reads only app.state + templates ---------- */
+  app.renderAll = function renderAll() {
+    renderGlobalSummary();
+    reconcileStoryList();
+    return app.state.stories;
+  };
+
+  /* ---------- incremental event wiring ---------- */
+
+  /* a story arrived (possibly mid-pagination): pop just that card in, in order */
+  app.on("sentiment:story", function (story) {
+    if (!story || story.id === undefined || story.id === null) { return; }
+    upsertStoryCard(story);
+  });
+
+  /* a comment row arrived: bump global count, story meta count, and append
+     the row only when that story is currently expanded */
+  app.on("sentiment:comment-row", function (row) {
+    if (!row) { return; }
+    if (summaryTitleEl) {
+      summaryTitleEl.textContent = "All comments: " + (app.state.commentRows || []).length;
+    }
+    var card = cardById.get(String(row.storyId));
+    if (card && card._story) {
+      renderCardMeta(card, card._story);
+    }
+    if (card && expandedSet().has(String(row.storyId))) {
+      var commentsEl = card.querySelector(".story-comments");
+      if (commentsEl) {
+        var note = commentsEl.querySelector(".comments-empty");
+        if (note && note.parentNode) { note.parentNode.removeChild(note); }
+        var node = renderCommentRow(row);
+        if (node) { commentsEl.appendChild(node); }
+      }
+    }
+  });
+
+  /* a rerun started: drop every rendered card so nothing duplicates */
+  app.on("sentiment:stories-loading", function () {
+    cardById.clear();
+    if (storyListEl) { storyListEl.textContent = ""; }
+    showListMessage("Loading stories…");
+  });
+
+  /* all pages for the range are in: reconcile order + empty state */
+  app.on("sentiment:stories", function () {
+    reconcileStoryList();
+    updateEmptyState();
+  });
+
+  /* comment scan finished: one full reconcile for final counts + expansions */
+  app.on("sentiment:comments", function () {
+    app.renderAll();
+  });
+
+  /* progress: status text only, no DOM rebuilding */
+  app.on("sentiment:comments-progress", function (detail) {
+    if (!statusEl || !detail) { return; }
+    statusEl.textContent = "loading comments " + detail.done + " of " + detail.total +
+      " · " + detail.rows + " rows";
+  });
+
+  /* ---------- initial paint: show whatever state already exists ---------- */
+  app.renderAll();
 })();
 </script>
