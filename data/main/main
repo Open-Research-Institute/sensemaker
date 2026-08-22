@@ -1236,3 +1236,113 @@ window.addEventListener('keydown', function(event) {
   });
 })();
 </script><script>window.dispatchEvent(new CustomEvent('main:ready'))</script>
+<script>
+(async function() {
+  var app = window.sentiment && window.sentiment.hackernews;
+  var hnEmoji = window.hnEmoji;
+  if (!app && hnEmoji) { app = hnEmoji; }
+  if (!app) {
+    window.dispatchEvent(new CustomEvent("sentiment:error", { detail: { message: "window.sentiment.hackernews missing" } }));
+    return;
+  }
+
+  app.config = app.config || {};
+  app.state = app.state || {};
+
+  if (typeof app.config.hideCommentless === "undefined") {
+    app.config.hideCommentless = true;
+  }
+
+  var emit = function(name, detail) {
+    window.dispatchEvent(new CustomEvent(name, { detail: detail }));
+  };
+
+  var rowCounts = function() {
+    var counts = new Map();
+    var rows = app.state.commentRows || [];
+    for (var i = 0; i < rows.length; i++) {
+      var id = rows[i] && rows[i].storyId;
+      if (id === null || typeof id === "undefined") { continue; }
+      counts.set(id, (counts.get(id) || 0) + 1);
+    }
+    return counts;
+  };
+
+  var shouldHide = function(story, counts, finalPass) {
+    if (!app.config.hideCommentless) { return false; }
+    var count = counts.get(story.id);
+    if (finalPass) {
+      return !count;
+    }
+    if (story.numComments === 0 && typeof count === "undefined") {
+      return true;
+    }
+    return false;
+  };
+
+  var applyFilter = function(finalPass) {
+    var listEl = document.getElementById("story-list");
+    if (!listEl) { return; }
+    var stories = app.state.stories || [];
+    var counts = rowCounts();
+    var cards = listEl.children;
+    var hidden = 0;
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var story = stories[i];
+      if (!story) { continue; }
+      if (card.dataset && !card.dataset.storyId) {
+        card.dataset.storyId = String(story.id);
+      }
+      if (shouldHide(story, counts, finalPass)) {
+        card.style.display = "none";
+        hidden++;
+      } else {
+        card.style.display = "";
+      }
+    }
+    var status = document.getElementById("status");
+    if (status) {
+      var text = status.textContent || "";
+      var mentions = text.indexOf("hidden commentless") !== -1;
+      var idle = !/loading|fetching|classifying|…|\.\.\./i.test(text);
+      if (idle || mentions) {
+        var base = text.replace(/\s*hidden commentless:\s*\d+/gi, "").replace(/\s+$/, "");
+        status.textContent = (base ? base + " " : "") + "hidden commentless: " + hidden;
+      }
+    }
+  };
+
+  app.setHideCommentless = function(value) {
+    var enabled = !!value;
+    app.config.hideCommentless = enabled;
+    emit("sentiment:hide-commentless", enabled);
+    applyFilter(true);
+  };
+
+  if (!app.state._hideFilterWrapped) {
+    app.state._hideFilterWrapped = true;
+    var previousRenderAll = app.renderAll;
+    app.renderAll = function() {
+      var result = previousRenderAll.apply(app, arguments);
+      applyFilter(false);
+      return result;
+    };
+  }
+
+  app.on("sentiment:story", function() { applyFilter(false); });
+  app.on("sentiment:comment-row", function() { applyFilter(false); });
+  app.on("sentiment:comments", function() { applyFilter(true); });
+  app.on("sentiment:stories-loading", function() {
+    var listEl = document.getElementById("story-list");
+    if (!listEl) { return; }
+    var cards = listEl.children;
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].style.display = "";
+      if (cards[i].dataset) { delete cards[i].dataset.storyId; }
+    }
+  });
+
+  applyFilter(false);
+})();
+</script>
