@@ -21,7 +21,22 @@
     </tbody>
 </table>
 
-# Documentation
+## What is it?
+**The Sensemaker is a browser-based dashboard builder for social media.** You program the system by clicking and following hyperlinks that fetch, transform, and visualize data.
+
+## Quickstart - First 5 minutes
+
+coming soon
+
+## How it works - the mental model
+
+coming soon
+
+## Cookbook - common tasks
+
+coming soon
+
+## Developer documentation - hosting and remixing your own simulators
 > This project is in active development but is in a working state! Preview it at: https://openresearchinstitute.org/sensemaker/
 
 1. The Kernel - this Operating System "grows" from a single QR Code...learn how this works: [index.html Kernel QR Code](./docs/kernel.md)
