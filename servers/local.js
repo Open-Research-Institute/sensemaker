@@ -6,9 +6,6 @@ import { fileURLToPath } from 'url'
 import url from 'url'
 import path from 'path'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
 const PORT = process.env.QRX_PORT || 3000
 const DATA_DIR = resolve(join(process.cwd(), 'data'))
 const INDEX_PATH = resolve(join(process.cwd(), 'public', 'data', 'index.json'))
