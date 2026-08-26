@@ -1,0 +1,216 @@
+#sentiment/hackernews.html?e&w&p=TASK: output raw HTML fragments and CSS only, wireframe for a Hacker News emoji sentiment lens
+  - absolutely no html, head, body, meta, title, or doctype tags
+  - DO NOT create main#A it is already there
+  - no javascript at all, this is just the skeleton
+  - one style tag for all styles
+  - this fragment will usually run inside an iframe, sometimes top window, so make a single root div id="postscope-root" that fills 100 percent of its available viewport height and width without assuming document body
+  - dark theme so emojis and orange accents pop: background #0b0f14, panel #11161d, text #e6edf3, muted #8b949e, border #30363d, accent #ff6600
+  - basic reset for this root only: box-sizing border-box on root and descendants, margin 0 on root children, font family system sans
+  - header bar id="topbar" across the top, flex wrap gap, sticky within root, containing:
+    - label plus date input id="start-date"
+    - label plus date input id="end-date"
+    - submit button id="submit-btn" labelled "Run"
+    - keyword input id="keyword-input" placeholder "idea or term"
+    - button id="spread-btn" labelled "Trace"
+    - button id="download-btn" labelled "Download PNG"
+    - status span id="status" muted text
+  - add a second compact control row id="classifier-bar" directly below topbar and above global-emoji-summary, same dark panel style, containing:
+    - text input id="llm-model" placeholder "model override, blank inherits global m"
+    - text input id="llm-endpoint" placeholder "endpoint override, blank inherits global h"
+    - password input id="llm-key" placeholder "key override, blank inherits global k" autocomplete off
+    - text input id="emoji-set" value="😊 😡 😂 🤔 😢 😮 💀" aria-label "emoji set"
+    - status span id="classifier-status" muted text
+    - style these inputs slightly slimmer than the topbar controls, with the emoji-set input wide enough to show about eight emoji
+  - below classifier bar a summary strip id="global-emoji-summary" with title "All comments" and three large emoji slot spans class="global-emoji-slot" plus small count spans class="global-emoji-count"
+  - main area id="main-area" fills remaining height as flex row:
+    - section id="stories-pane" flex 1 scrollable with heading "Stories" and div id="story-list"
+    - aside id="spread-pane" fixed width about 32 percent of root, scrollable, heading "Idea spread", div id="spread-list", muted empty state text
+  - hidden template id="story-row-template" for one story card:
+    - button class="story-head" with class="story-title", class="story-meta", and span class="story-emoji-slots" containing three span class="story-emoji-slot" each with span class="story-emoji-count"
+    - div class="story-comments" display none by default
+  - hidden template id="comment-row-template" for one comment row:
+    - span class="comment-emoji"
+    - span class="comment-author"
+    - div class="comment-text"
+  - style story cards as dark panels with border, rounded corners, hover lift, expanded state class="open" reveals comments
+  - emoji slots are large, counts are tiny muted chips
+  - spread list items are chronological cards with a small origin badge style for the first match using accent border
+  - all interactive looking elements get focus-visible outline in accent color
+  - include data-emoji-set="😊 😡 😂 🤔 😢 😮 💀" on postscope-root as the initial fallback for later scripts
+&w&a=1&p=TASK: output one SCRIPT tag that creates the shared namespace and contracts for the Hacker News emoji lens
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - do not fetch anything, do not render anything, do not bind submit yet
+  - create window.sentiment if missing, then create window.sentiment.hackernews if missing, and keep a local var named app pointing at it
+  - never replace window.sentiment or window.sentiment.hackernews if they already exist, only mutate them in place
+  - read the fixed emoji set from the existing root element with id postscope-root attribute data-emoji-set, split on whitespace, fallback to exactly 😊 😡 😂 🤔 😢 😮 💀
+  - set app.version to "v0" and app.ready to false
+  - create app.config with changeable defaults: algoliaBase "https://hn.algolia.com/api/v1/", storyTag "story", maxStories 25, frontPageMinPoints 20, commentDepth "top-level-only", cachePrefix "hn-emoji-lens:", dateEndInclusive true, spreadSearchComments false
+  - create app.state with shape: range {start:null,end:null}, stories [], commentRows [], storyTop {}, globalTop [], spread {term:"",origin:null,later:[]}, loading false, lastError null
+  - create a tiny event system on app: on, off, emit, where emit also dispatches a window CustomEvent with the same name and detail so iframe hosts can listen with window.addEventListener
+  - create app.cache with an in memory Map plus localStorage persistence under config.cachePrefix: makeKey from normalized text, get, set, has, clear, and stableHash that returns a short string for any input text
+  - cacheGet and cacheSet should be promise friendly but work synchronously when possible
+  - attach placeholder public methods on app so later chains can replace them without changing the object identity: loadRange, reload, setRange, loadComments, classifyText, renderAll, expandStory, collapseStory, searchSpread, exportPNG
+  - each placeholder sets state.lastError to a clear "not wired yet" message and emits "sentiment:error" with detail {method:name}
+  - add app.util with: localDateString using local getFullYear, getMonth plus one, getDate with zero padding, toUnixSeconds from a date input value, endOfDayUnixSeconds honoring config.dateEndInclusive, escapeHtml, clamp, sortEmojiCounts descending by count then by the fixed emoji set order, debounce
+  - expose a console friendly alias window.hnEmoji = app
+  - emit "sentiment:namespace" with detail app when done
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that wires the date controls and loads Hacker News stories into the shared namespace
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not create window.sentiment, do not render rows, do not fetch comments yet
+  - prevent any native form submission or page reload from the header controls
+  - set default dates early but never auto submit: if start-date input is empty set it to app.util.localDateString of today minus 7 days, if end-date input is empty set it to app.util.localDateString of today, then update status to "ready"
+  - replace app.loadRange in place on the existing app object with async function loadRange(startValue, endValue)
+    - set app.state.loading true, app.state.lastError null, update element id status to "loading stories"
+    - emit "sentiment:stories-loading" with detail {start:startValue,end:endValue}
+    - mutate app.state.range in place to {start:startValue,end:endValue} and set app.state.stories to [] before fetching so a rerun clears old cards
+    - convert startValue with app.util.toUnixSeconds and endValue with app.util.endOfDayUnixSeconds honoring app.config.dateEndInclusive
+    - build a URL from app.config.algoliaBase plus "search_by_date" using URL and URLSearchParams
+    - set search param tags to app.config.storyTag
+    - set search param numericFilters to the exact string created_at_i greater than START comma created_at_i less than END, using the computed unix numbers
+    - page with search param page from zero while collected stories are below app.config.maxStories and the response says more pages exist
+    - plain GET fetch only, no CORS proxy, no Firebase
+    - response shape is hits array, page number, nbPages number, hitsPerPage number
+    - normalize each hit into {id:objectID as string,title,url,hnUrl,points or 0,numComments or 0,author,createdAt:created_at_i,storyText:story_text or "",frontPage: points greater than or equal to app.config.frontPageMinPoints,raw:hit}
+    - hnUrl uses the HN item page base with the id as a search param built through URLSearchParams
+    - as each hit is normalized push it into app.state.stories and emit "sentiment:story" with detail that story so cards pop in during pagination
+    - update status after each page with collected count plus date range
+    - when finished emit "sentiment:stories" with detail app.state.stories
+    - on failure set app.state.lastError, update status with the message, emit "sentiment:error" with detail {method:"loadRange",error:message}
+    - always set app.state.loading false before returning
+  - replace app.setRange in place so it writes the two date input values, mutates app.state.range, and returns the range
+  - replace app.reload in place so it calls app.loadRange with current app.state.range start and end
+  - bind click on element id submit-btn to read start-date and end-date values and call app.loadRange
+  - bind Enter keydown on start-date and end-date to do the same
+  - do not call app.loadRange on script load
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that fetches the full Algolia item tree for each loaded story and flattens top level comments into global rows
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not create the namespace, do not classify yet, do not render yet
+  - replace app.loadComments in place on the existing app object with async function loadComments(stories)
+    - stories defaults to app.state.stories
+    - if no stories array or it is empty, update element id status to "no stories to scan" and return []
+    - set app.state.loading true, app.state.lastError null
+    - reset derived comment state in place before fetching: app.state.commentRows becomes [], app.state.storyTop becomes {}, app.state.globalTop becomes []
+    - update status to "loading comments 0 of N"
+    - emit "sentiment:comments-loading" with detail {count:stories.length}
+    - for each story, fetch one URL built from app.config.algoliaBase plus "items/" plus story.id
+    - plain GET fetch only, no CORS proxy, no Firebase, one request per story
+    - response item has id, author, text, created_at_i, points, title, url, and children array
+    - v0 rule: use only item.children as top level comments, do not walk nested replies yet, but store each top level comment children length as replyCount
+    - for every top level child push one row into app.state.commentRows with exact shape {storyId:story.id,storyTitle:story.title,storyUrl:story.url,hnUrl:story.hnUrl,storyPoints:story.points,storyCreatedAt:story.createdAt,commentId:String(child.id),author:child.author or "",text:child.text or "",createdAt:child.created_at_i or 0,replyCount:child.children and child.children.length or 0,emoji:null,raw:child}
+    - immediately emit "sentiment:comment-row" with detail that row so expanded comments and counts can pop in while later stories are still fetching
+    - keep rows ordered by story order, then by comment createdAt ascending inside that story
+    - after each story update status to "loading comments X of N" and emit "sentiment:comments-progress" with detail {done:X,total:N,rows:app.state.commentRows.length}
+    - if one story fails, set app.state.lastError to the message, emit "sentiment:error" with detail {method:"loadComments",storyId:story.id,error:message}, then continue with the next story
+    - when finished set app.state.loading false, update status to total comment rows loaded, emit "sentiment:comments" with detail app.state.commentRows
+    - return app.state.commentRows
+  - add exactly one app.on("sentiment:stories") handler that calls app.loadComments(detail) so a fresh date run automatically pulls comments
+  - make repeated runs safe: when "sentiment:stories-loading" fires, clear app.state.commentRows to [] and app.state.storyTop to {} and app.state.globalTop to [] before new fetches begin
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that renders the current data with pending emoji placeholders and pop in updates
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not fetch stories directly, do not fetch comments directly, do not classify yet, do not set dates, do not auto submit
+  - replace app.renderAll in place on the existing app object with function renderAll()
+  - renderAll reads only app.state and existing templates, never raw fetch responses
+  - keep a local Map keyed by story id for rendered story cards so incremental events can update one card without clearing the list
+  - global summary: fill the three elements with class global-emoji-slot using ⏳️ for every slot, set the matching global-emoji-count spans to "pending", and set the summary title to "All comments: N" where N is app.state.commentRows.length
+  - renderStoryCard(story) clones node from template id story-row-template, shows story.title escaped, meta line with points, author, numComments, created date, and frontPage badge "front page" when story.frontPage is true
+  - title links to story.url when present otherwise story.hnUrl, target _blank rel noreferrer
+  - the three story-emoji-slot spans show ⏳️ and story-emoji-count spans show "pending" until a later classifier fills row.emoji values
+  - story comments container starts hidden unless story id is in a local expanded set on app.state._expanded, and the card gets class open when expanded
+  - replace app.expandStory and app.collapseStory in place so they mutate app.state._expanded in place and update only that story card
+  - clicking a story-head toggles that story id in app.state._expanded, prevents default on links inside the head, and updates only that story card
+  - renderCommentRow(row) clones template id comment-row-template, shows comment-emoji as ⏳️, comment-author escaped or "anonymous", comment-text escaped with basic line breaks preserved, and a muted reply count when replyCount is above zero
+  - keep DOM building with DocumentFragment and textContent or escaped HTML only, no innerHTML with raw comment text
+  - add app.on("sentiment:story") that inserts or updates that one story card in story order so stories pop in as pages arrive
+  - add app.on("sentiment:comment-row") that updates the global summary count, updates that story meta comment count, and appends the comment row only when that story is expanded
+  - add app.on("sentiment:stories-loading") that clears the story list Map and story-list element so reruns do not duplicate cards
+  - add app.on("sentiment:stories") that reconciles the full list order and updates empty state
+  - add app.on("sentiment:comments") that calls app.renderAll once to reconcile final counts and expanded comments
+  - add app.on("sentiment:comments-progress") that only updates element id status with done, total, and rows so progress is visible without rebuilding DOM every story
+  - call app.renderAll once at the end so existing state is visible even if events fired before this script loaded
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that populates and persists the classifier override controls and editable emoji set
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not fetch stories, do not fetch comments, do not classify yet, do not call any parent kernel function
+  - add app.config.storageKeys in place with exact names: model "sentiment.hackernews.m", endpoint "sentiment.hackernews.h", key "sentiment.hackernews.k", emojis "sentiment.hackernews.emojis"
+  - local helper readNs(name) returns localStorage.getItem(name) or empty string, writeNs(name,value) stores non empty values and removes the key when value is empty so blank means inherit global
+  - global defaults come from localStorage.getItem("m"), localStorage.getItem("h"), and localStorage.getItem("k") only, never from parent DOM
+  - replace app.getClassifierConfig in place so it returns {model: ns model or global m, endpoint: ns endpoint or global h, key: ns key or global k, modelSource, endpointSource, keySource} where each source is "override", "global", or "none"
+  - replace app.getEmojiSet in place so it parses ns emojis first, else root element id postscope-root data-emoji-set, else default 😊 😡 😂 🤔 😢 😮 💀, splits on whitespace, dedupes, and falls back to default when fewer than 2 valid tokens remain
+  - populate controls on load: llm-model value is only the namespaced override, placeholder shows global m or "no global model"; llm-endpoint value is only the namespaced override, placeholder shows global h or "no global endpoint"; llm-key is never filled from global, value is only the namespaced override, placeholder shows "global key present" or "no global key"
+  - on input or change for llm-model, llm-endpoint, and llm-key, write that namespaced key, update classifier-status, emit "sentiment:classifier-config" with detail app.getClassifierConfig()
+  - when llm-key gains focus or changes, classifier-status warns "key is stored plaintext in localStorage"
+  - emoji-set input starts from app.getEmojiSet().join(" ")
+  - on emoji-set change validate by splitting whitespace and deduping; if fewer than 2 tokens remain revert the input to app.getEmojiSet().join(" ") and set classifier-status to "need at least 2 emojis"
+  - on valid emoji-set change write the normalized joined string to storageKeys.emojis, set root data-emoji-set to the same string, set classifier-status to "emoji set saved", emit "sentiment:emoji-set" with detail the new array, then call app.renderAll if it exists so slot count and labels stay live
+  - expose app.refreshClassifierControls in place to re read storage and update all four controls plus placeholders without emitting change events
+  - update classifier-status once on load to show whether model, endpoint, and key are using override, global, or none
+  - use app.util.debounce for rapid typing where helpful, but flush the final value on change
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that upgrades the shared cache to IndexedDB for emoji classifications only
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - do not fetch stories, do not fetch comments, do not classify, do not render
+  - keep the existing app.cache object identity, mutate its internals in place, preserve public names get, set, has, clear, stableHash, and add ready, getMany, setMany, makeEmojiKey, getEmoji, setEmoji
+  - if app.config.cacheMax is missing set it to 5000, and if app.config.classifierVersion is missing set it to "clsV1"
+  - open indexedDB database named exactly "sentiment/hackernews_cache" version 1
+  - on upgrade create object store "emoji" with keyPath "key" and an index named "ts" on "ts"
+  - expose app.cache.ready as a promise that resolves to "indexeddb" when open succeeds, or "fallback" after a handled failure
+  - keep a hot in memory Map inside the same app.cache object for fast synchronous reads after warmup
+  - generic get key flow: check memory Map first, then await IndexedDB get, return the stored value object or null
+  - generic set key flow: write memory Map first, then best effort IndexedDB put of {key:key,value:value,ts:Date.now()}
+  - getMany takes an array of keys and returns a Map of key to value for found entries, using memory first and one IndexedDB transaction for misses
+  - setMany takes a Map or array of key value pairs, writes memory first, then best effort one IndexedDB readwrite transaction
+  - has and clear work across memory and IndexedDB, clear only clears the emoji store and memory, never localStorage settings
+  - makeEmojiKey(text) builds app.config.classifierVersion plus "|" plus current model from app.getClassifierConfig plus "|" plus app.cache.stableHash(app.getEmojiSet().join(" ")) plus "|" plus app.cache.stableHash(String(text).trim().toLowerCase())
+  - getEmoji(text) returns only the emoji string from get of makeEmojiKey(text), or null
+  - setEmoji(text, emoji) validates emoji is in app.getEmojiSet() before storing, stores value {emoji:emoji,model:current model,ts:Date.now()}, and returns false for invalid emoji
+  - after setMany, best effort trim: if store count is above app.config.cacheMax, walk the ts index oldest first and delete until back under the limit
+  - fallback mode when IndexedDB open or transactions fail: keep working with memory Map plus localStorage under app.config.cachePrefix, never throw into the UI, set classifier-status if present to "cache fallback mode", emit "sentiment:error" with detail {method:"cache",error:message}
+  - do not migrate localStorage settings keys into this database
+  - emit "sentiment:cache-ready" with detail {mode:mode} when ready resolves
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w&a=1&p=TASK: output one SCRIPT tag that runs cached batch emoji classification and updates the UI as emojis land
+  - wrap everything in an async IIFE, run immediately, no DOMContentLoaded wait
+  - use var for all variables
+  - read window.sentiment.hackernews into local var app and window.hnEmoji alias; if missing, emit window event "sentiment:error" and stop
+  - never call parent.gen or any kernel function, this is a standalone classifier client inside the iframe
+  - add config defaults in place if missing: classifyBatchSize 10, classifyConcurrency 2, classifyTimeoutMs 20000, classifyRetries 2
+  - wait for app.cache.ready before classifying, but never block rendering
+  - local helper configured() reads app.getClassifierConfig and returns false with classifier-status "classifier not configured" when model or endpoint is missing, key may be empty if the endpoint allows it
+  - local helper askModel(texts) posts JSON to config.endpoint with headers Content-Type application/json and Authorization Bearer config.key only when key is non empty
+  - body shape mirrors the kernel chat call: {model:config.model,messages:[{role:"user",content:prompt}],stream:false}
+  - prompt says: classify each Hacker News comment into exactly one emoji from the current app.getEmojiSet joined by spaces, input is a JSON array of strings, return a JSON array of emoji strings only, same length, same order, no markdown, no explanation
+  - parse response text from res.message.content or res.choices[0].message.content, then JSON.parse a top level array, validate length equals texts.length and every item is in app.getEmojiSet
+  - use AbortController timeout from config.classifyTimeoutMs, retry only network errors and HTTP 5xx up to config.classifyRetries, never retry HTTP 4xx
+  - if a batch is invalid or fails after retries, fall back to individual calls for those texts with the same rules
+  - cache flow: for queued rows first call app.cache.getEmoji(row.text), cache hits set row.emoji immediately, only misses join model batches, valid results call app.cache.setEmoji before UI update
+  - queue processing: maintain local FIFO queue and active workers count, start at most config.classifyConcurrency workers, each worker pulls up to config.classifyBatchSize uncached rows, resolves cache first, sends the rest, then continues until queue is empty
+  - cancellation: bump app.state._clsRunId on "sentiment:stories-loading", clear queue, abort in flight controllers, and every worker checks its captured run id before writing results
+  - when a row gets an emoji mutate row.emoji in place, call recomputeTops, emit "sentiment:comment-emoji" with detail row, then schedule applyEmojiOverlay debounced with app.util.debounce
+  - recomputeTops counts only rows with non null emoji across app.state.commentRows, sets app.state.globalTop using app.util.sortEmojiCounts, and sets app.state.storyTop as an object keyed by storyId with sorted emoji counts for that story, same rows, no extra grouping
+  - keep top display fixed to three slots, render fewer when the emoji set has fewer than three valid entries
+  - applyEmojiOverlay preserves the existing renderer: store previousRenderAll once, call it, then overlay known emojis onto the fresh DOM
+  - overlay global summary slots from app.state.globalTop, using ⏳️ and "pending" for slots with no classified emoji yet
+  - overlay each visible story card in story-list order matching app.state.stories order, setting that story three emoji slots from app.state.storyTop[story.id], using ⏳️ and "pending" for unknowns
+  - overlay expanded comments by filtering app.state.commentRows by storyId and writing visible comment-emoji spans in that same order with row.emoji or ⏳️
+  - replace app.renderAll in place with a function that calls previousRenderAll then applyEmojiOverlay, guarded so it cannot wrap itself twice
+  - bind click on submit-btn to start classification for current app.state.commentRows after the existing story and comment handlers, do not prevent default beyond existing handlers, do not refetch
+  - add app.on("sentiment:comment-row") that enqueues the new row when configured is true
+  - add app.on("sentiment:comments") that flushes any remaining queued rows and updates status to classified count plus total count
+  - add app.on("sentiment:emoji-set") and app.on("sentiment:classifier-config") that mark all row.emoji null, clear derived tops, and requeue current rows because the meaning of cached keys changed
+  - status should show cache hits, model misses, failed count, and classified of total without spamming one status write per comment
+  - ONLY generate this SCRIPT tag, do not return the previous code
+&w

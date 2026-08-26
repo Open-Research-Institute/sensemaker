@@ -1,0 +1,2698 @@
+<div id="postscope-root" data-emoji-set="😊 😡 😂 🤔 😢 😮 💀">
+<style>
+#postscope-root, #postscope-root * { box-sizing: border-box; margin: 0; }
+#postscope-root {
+  --ps-bg: #0b0f14;
+  --ps-panel: #11161d;
+  --ps-text: #e6edf3;
+  --ps-muted: #8b949e;
+  --ps-border: #30363d;
+  --ps-accent: #ff6600;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ps-bg);
+  color: var(--ps-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  color-scheme: dark;
+}
+/* ---- topbar ---- */
+#postscope-root #topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--ps-panel);
+  border-bottom: 1px solid var(--ps-border);
+}
+#postscope-root #topbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--ps-muted);
+}
+#postscope-root input, #postscope-root button {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ps-text);
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 6px;
+  padding: 0.38rem 0.6rem;
+}
+#postscope-root button {
+  cursor: pointer;
+  background: #161d26;
+  transition: border-color 0.15s ease, filter 0.15s ease;
+}
+#postscope-root button:hover { border-color: var(--ps-accent); }
+#postscope-root #submit-btn {
+  background: var(--ps-accent);
+  border-color: var(--ps-accent);
+  color: #0b0f14;
+  font-weight: 700;
+}
+#postscope-root #submit-btn:hover { filter: brightness(1.1); }
+#postscope-root #keyword-input { min-width: 11rem; }
+#postscope-root #status { margin-left: auto; color: var(--ps-muted); font-size: 0.78rem; }
+/* ---- classifier bar (slimmer controls) ---- */
+#postscope-root #classifier-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  padding: 0.45rem 0.9rem;
+  background: var(--ps-panel);
+  border-bottom: 1px solid var(--ps-border);
+}
+#postscope-root #classifier-bar input {
+  font-size: 0.78rem;
+  padding: 0.24rem 0.5rem;
+  border-radius: 5px;
+  flex: 1 1 9rem;
+  min-width: 7rem;
+}
+#postscope-root #classifier-bar #emoji-set { flex: 0 0 15em; min-width: 0; }
+#postscope-root #classifier-status { color: var(--ps-muted); font-size: 0.74rem; }
+/* ---- global emoji summary strip ---- */
+#postscope-root #global-emoji-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--ps-panel);
+  border-bottom: 1px solid var(--ps-border);
+}
+#postscope-root #global-emoji-summary .summary-title { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em; }
+#postscope-root .global-emoji-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.45rem;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+}
+#postscope-root .global-emoji-count {
+  position: absolute;
+  right: -0.45rem;
+  bottom: -0.45rem;
+  font-size: 0.6rem;
+  line-height: 1;
+  color: var(--ps-muted);
+  background: #1b222c;
+  border: 1px solid var(--ps-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.35rem;
+}
+/* ---- main area ---- */
+#postscope-root #main-area { flex: 1 1 auto; min-height: 0; display: flex; }
+#postscope-root #stories-pane { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 0.9rem; }
+#postscope-root #spread-pane {
+  flex: 0 0 32%;
+  min-width: 230px;
+  overflow-y: auto;
+  padding: 0.9rem;
+  background: var(--ps-panel);
+  border-left: 1px solid var(--ps-border);
+}
+#postscope-root #stories-pane h2, #postscope-root #spread-pane h2 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ps-muted);
+  margin-bottom: 0.75rem;
+}
+/* ---- story cards ---- */
+#postscope-root .story-card {
+  background: var(--ps-panel);
+  border: 1px solid var(--ps-border);
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+#postscope-root .story-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  border-color: #3d444d;
+}
+#postscope-root .story-card.open { border-color: var(--ps-accent); }
+#postscope-root .story-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem 0.9rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+}
+#postscope-root .story-head:hover { background: #141b24; }
+#postscope-root .story-title { font-size: 0.95rem; font-weight: 600; color: var(--ps-text); }
+#postscope-root .story-meta { font-size: 0.74rem; color: var(--ps-muted); }
+#postscope-root .story-emoji-slots { display: flex; gap: 0.45rem; }
+#postscope-root .story-emoji-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  font-size: 1.15rem;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 6px;
+}
+#postscope-root .story-emoji-count {
+  position: absolute;
+  right: -0.4rem;
+  bottom: -0.4rem;
+  font-size: 0.58rem;
+  line-height: 1;
+  color: var(--ps-muted);
+  background: #1b222c;
+  border: 1px solid var(--ps-border);
+  border-radius: 999px;
+  padding: 0.12rem 0.3rem;
+}
+#postscope-root .story-comments { display: none; border-top: 1px solid var(--ps-border); padding: 0.5rem 0.9rem 0.7rem; }
+#postscope-root .story-card.open .story-comments { display: block; }
+/* ---- comment rows ---- */
+#postscope-root .comment-row {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr;
+  column-gap: 0.5rem;
+  row-gap: 0.1rem;
+  padding: 0.45rem 0;
+}
+#postscope-root .comment-row + .comment-row { border-top: 1px solid #21262d; }
+#postscope-root .comment-emoji { grid-row: span 2; font-size: 1.1rem; text-align: center; }
+#postscope-root .comment-author { font-size: 0.74rem; font-weight: 600; color: var(--ps-accent); }
+#postscope-root .comment-text { font-size: 0.84rem; color: var(--ps-text); overflow-wrap: anywhere; }
+/* ---- spread pane items ---- */
+#postscope-root .spread-empty { color: var(--ps-muted); font-size: 0.82rem; }
+#postscope-root .spread-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.6rem;
+}
+#postscope-root .spread-meta { font-size: 0.7rem; color: var(--ps-muted); }
+#postscope-root .origin-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-accent);
+  border: 1px solid var(--ps-accent);
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+}
+/* ---- focus, placeholder, scrollbars ---- */
+#postscope-root :focus-visible { outline: 2px solid var(--ps-accent); outline-offset: 2px; }
+#postscope-root input:focus-visible { outline-offset: 0; border-color: var(--ps-accent); }
+#postscope-root ::placeholder { color: #6e7681; }
+#postscope-root #stories-pane::-webkit-scrollbar, #postscope-root #spread-pane::-webkit-scrollbar { width: 8px; }
+#postscope-root #stories-pane::-webkit-scrollbar-thumb, #postscope-root #spread-pane::-webkit-scrollbar-thumb { background: var(--ps-border); border-radius: 999px; }
+#postscope-root #stories-pane::-webkit-scrollbar-track, #postscope-root #spread-pane::-webkit-scrollbar-track { background: transparent; }
+@media (max-width: 640px) {
+  #postscope-root #main-area { flex-direction: column; }
+  #postscope-root #spread-pane { flex: 0 0 auto; width: auto; min-width: 0; border-left: 0; border-top: 1px solid var(--ps-border); }
+}
+</style>
+
+<header id="topbar">
+  <label>From <input type="date" id="start-date"></label>
+  <label>To <input type="date" id="end-date"></label>
+  <button type="submit" id="submit-btn">Run</button>
+  <input type="text" id="keyword-input" placeholder="idea or term" aria-label="idea or term">
+  <button type="button" id="spread-btn">Trace</button>
+  <button type="button" id="download-btn">Download PNG</button>
+  <span id="status" aria-live="polite">idle</span>
+</header>
+
+<div id="classifier-bar">
+  <input type="text" id="llm-model" placeholder="model override, blank inherits global m">
+  <input type="text" id="llm-endpoint" placeholder="endpoint override, blank inherits global h">
+  <input type="password" id="llm-key" placeholder="key override, blank inherits global k" autocomplete="off">
+  <input type="text" id="emoji-set" value="😊 😡 😂 🤔 😢 😮 💀" aria-label="emoji set">
+  <span id="classifier-status" aria-live="polite"></span>
+</div>
+
+<div id="global-emoji-summary">
+  <span class="summary-title">All comments</span>
+  <span class="global-emoji-slot"><span class="global-emoji-count">0</span></span>
+  <span class="global-emoji-slot"><span class="global-emoji-count">0</span></span>
+  <span class="global-emoji-slot"><span class="global-emoji-count">0</span></span>
+</div>
+
+<div id="main-area">
+  <section id="stories-pane">
+    <h2>Stories</h2>
+    <div id="story-list"></div>
+  </section>
+  <aside id="spread-pane">
+    <h2>Idea spread</h2>
+    <div id="spread-list">
+      <p class="spread-empty">No trace yet — enter an idea or term and press Trace.</p>
+    </div>
+  </aside>
+</div>
+
+<template id="story-row-template">
+  <div class="story-card">
+    <button type="button" class="story-head">
+      <span class="story-title"></span>
+      <span class="story-meta"></span>
+      <span class="story-emoji-slots">
+        <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+        <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+        <span class="story-emoji-slot"><span class="story-emoji-count"></span></span>
+      </span>
+    </button>
+    <div class="story-comments"></div>
+  </div>
+</template>
+
+<template id="comment-row-template">
+  <div class="comment-row">
+    <span class="comment-emoji"></span>
+    <span class="comment-author"></span>
+    <div class="comment-text"></div>
+  </div>
+</template>
+</div>
+<script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ============================================================
+     Hacker News emoji lens — shared namespace + contracts (v0)
+     No fetching, no rendering, no submit binding here.
+     ============================================================ */
+
+  /* ---------- namespace: create only if missing, mutate in place ---------- */
+  if (!w.sentiment) { w.sentiment = {}; }
+  if (!w.sentiment.hackernews) { w.sentiment.hackernews = {}; }
+  var app = w.sentiment.hackernews;
+
+  /* ---------- fixed emoji set (read from existing root, else fallback) ---------- */
+  var FALLBACK_EMOJI_SET = ["😊", "😡", "😂", "🤔", "😢", "😮", "💀"];
+  function readEmojiSet() {
+    try {
+      var root = document.getElementById("postscope-root");
+      var raw = root ? root.getAttribute("data-emoji-set") : null;
+      if (raw) {
+        var parts = String(raw).split(/\s+/);
+        var out = [];
+        for (var i = 0; i < parts.length; i++) {
+          if (parts[i]) { out.push(parts[i]); }
+        }
+        if (out.length > 0) { return out; }
+      }
+    } catch (err) { /* fall through to fallback set */ }
+    return FALLBACK_EMOJI_SET.slice();
+  }
+  app.emojiSet = readEmojiSet();
+
+  /* ---------- identity / lifecycle ---------- */
+  app.version = "v0";
+  app.ready = false;
+
+  /* ---------- config: changeable defaults (fill missing keys only) ---------- */
+  app.config = app.config || {};
+  var CONFIG_DEFAULTS = {
+    algoliaBase: "https://hn.algolia.com/api/v1/",
+    storyTag: "story",
+    maxStories: 25,
+    frontPageMinPoints: 20,
+    commentDepth: "top-level-only",
+    cachePrefix: "hn-emoji-lens:",
+    dateEndInclusive: true,
+    spreadSearchComments: false
+  };
+  for (var configKey in CONFIG_DEFAULTS) {
+    if (Object.prototype.hasOwnProperty.call(CONFIG_DEFAULTS, configKey) &&
+        app.config[configKey] === undefined) {
+      app.config[configKey] = CONFIG_DEFAULTS[configKey];
+    }
+  }
+
+  /* ---------- state: canonical shape (fill missing keys only) ---------- */
+  app.state = app.state || {};
+  function ensureState(key, value) {
+    if (app.state[key] === undefined) { app.state[key] = value; }
+  }
+  ensureState("range", { start: null, end: null });
+  ensureState("stories", []);
+  ensureState("commentRows", []);
+  ensureState("storyTop", {});
+  ensureState("globalTop", []);
+  ensureState("spread", { term: "", origin: null, later: [] });
+  ensureState("loading", false);
+  ensureState("lastError", null);
+
+  /* ---------- tiny event system: on / off / emit ----------
+     emit also dispatches a window CustomEvent with the same
+     name and detail so iframe hosts can listen via
+     window.addEventListener. */
+  var listeners = app._listeners || {};
+  app._listeners = listeners;
+
+  app.on = function (name, fn) {
+    if (typeof fn !== "function") { return function () {}; }
+    var bucket = listeners[name];
+    if (!bucket) { bucket = listeners[name] = []; }
+    bucket.push(fn);
+    return function () { app.off(name, fn); };
+  };
+
+  app.off = function (name, fn) {
+    var bucket = listeners[name];
+    if (!bucket) { return; }
+    if (fn === undefined) { listeners[name] = []; return; }
+    for (var i = bucket.length - 1; i >= 0; i--) {
+      if (bucket[i] === fn) { bucket.splice(i, 1); }
+    }
+  };
+
+  app.emit = function (name, detail) {
+    var bucket = listeners[name];
+    if (bucket && bucket.length > 0) {
+      var snapshot = bucket.slice();
+      for (var i = 0; i < snapshot.length; i++) {
+        try { snapshot[i](detail); } catch (err) {
+          if (w.console && w.console.error) {
+            w.console.error("[sentiment] listener error on " + name, err);
+          }
+        }
+      }
+    }
+    try {
+      var evt;
+      if (typeof w.CustomEvent === "function") {
+        evt = new w.CustomEvent(name, { detail: detail });
+      } else {
+        evt = document.createEvent("CustomEvent");
+        evt.initCustomEvent(name, false, false, detail);
+      }
+      w.dispatchEvent(evt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return detail;
+  };
+
+  /* ---------- cache: in-memory Map + localStorage persistence ----------
+     get/set are promise friendly (await works on their return
+     values) but resolve synchronously whenever possible. */
+  var memory = new Map();
+
+  function stableHash(text) {
+    var s = String(text === null || text === undefined ? "" : text);
+    var h1 = 5381;
+    var h2 = 52711;
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      h1 = (((h1 << 5) + h1) + c) | 0;
+      h2 = (((h2 << 5) + h2) ^ c) | 0;
+    }
+    return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36);
+  }
+
+  function normalizeText(text) {
+    return String(text === null || text === undefined ? "" : text)
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/^\s+|\s+$/g, "");
+  }
+
+  function readStored(key) {
+    try {
+      var ls = w.localStorage;
+      if (!ls) { return { found: false, value: null }; }
+      var raw = ls.getItem(key);
+      if (raw === null || raw === undefined) { return { found: false, value: null }; }
+      return { found: true, value: JSON.parse(raw) };
+    } catch (err) {
+      return { found: false, value: null };
+    }
+  }
+
+  function writeStored(key, value) {
+    try {
+      var ls = w.localStorage;
+      if (ls) { ls.setItem(key, JSON.stringify(value)); }
+    } catch (err) { /* storage unavailable or full; memory copy survives */ }
+  }
+
+  app.cache = {
+    memory: memory,
+    stableHash: stableHash,
+    makeKey: function (text) {
+      return app.config.cachePrefix + stableHash(normalizeText(text));
+    },
+    get: function (key) {
+      if (memory.has(key)) { return memory.get(key); }
+      var stored = readStored(key);
+      if (stored.found) {
+        memory.set(key, stored.value);
+        return stored.value;
+      }
+      return null;
+    },
+    set: function (key, value) {
+      if (value && typeof value.then === "function") {
+        return value.then(function (resolved) {
+          memory.set(key, resolved);
+          writeStored(key, resolved);
+          return resolved;
+        });
+      }
+      memory.set(key, value);
+      writeStored(key, value);
+      return value;
+    },
+    has: function (key) {
+      if (memory.has(key)) { return true; }
+      return readStored(key).found;
+    },
+    clear: function () {
+      memory.clear();
+      try {
+        var ls = w.localStorage;
+        if (!ls) { return; }
+        var prefix = app.config.cachePrefix;
+        var doomed = [];
+        for (var i = 0; i < ls.length; i++) {
+          var k = ls.key(i);
+          if (k !== null && k.indexOf(prefix) === 0) { doomed.push(k); }
+        }
+        for (var j = 0; j < doomed.length; j++) { ls.removeItem(doomed[j]); }
+      } catch (err) { /* storage unavailable */ }
+    }
+  };
+
+  /* ---------- util ---------- */
+  function pad2(n) {
+    n = String(n);
+    return n.length < 2 ? "0" + n : n;
+  }
+
+  app.util = {
+    localDateString: function (date) {
+      var d = date instanceof Date ? date : new Date();
+      return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+    },
+    toUnixSeconds: function (value) {
+      if (value === null || value === undefined || value === "") { return null; }
+      if (typeof value === "number" && isFinite(value)) {
+        return Math.floor(value); /* already seconds */
+      }
+      var d;
+      if (value instanceof Date) {
+        d = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0);
+      } else {
+        var parts = String(value).split("-");
+        if (parts.length !== 3) { return null; }
+        var y = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10);
+        var day = parseInt(parts[2], 10);
+        if (isNaN(y) || isNaN(m) || isNaN(day)) { return null; }
+        d = new Date(y, m - 1, day, 0, 0, 0, 0); /* local midnight */
+      }
+      return Math.floor(d.getTime() / 1000);
+    },
+    endOfDayUnixSeconds: function (value) {
+      var start = app.util.toUnixSeconds(value);
+      if (start === null) { return null; }
+      /* inclusive: 23:59:59 of that day; exclusive: next local midnight */
+      return app.config.dateEndInclusive ? start + 86399 : start + 86400;
+    },
+    escapeHtml: function (text) {
+      return String(text === null || text === undefined ? "" : text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    },
+    clamp: function (value, min, max) {
+      var n = Number(value);
+      if (isNaN(n)) { n = min; }
+      if (n < min) { return min; }
+      if (n > max) { return max; }
+      return n;
+    },
+    sortEmojiCounts: function (list) {
+      /* accepts [{emoji,count}], [[emoji,count]], or {emoji:count};
+         returns a new array sorted by count desc, ties broken by the
+         fixed emoji set order, unknown emojis last (stable). */
+      var entries = [];
+      var i;
+      if (list === null || list === undefined) { return []; }
+      if (Object.prototype.toString.call(list) === "[object Array]") {
+        for (i = 0; i < list.length; i++) { entries.push(list[i]); }
+      } else if (typeof list === "object") {
+        for (var k in list) {
+          if (Object.prototype.hasOwnProperty.call(list, k)) {
+            entries.push({ emoji: k, count: list[k] });
+          }
+        }
+      }
+      var order = {};
+      for (i = 0; i < app.emojiSet.length; i++) {
+        if (!(app.emojiSet[i] in order)) { order[app.emojiSet[i]] = i; }
+      }
+      var wrapped = [];
+      for (i = 0; i < entries.length; i++) {
+        var item = entries[i];
+        var emoji;
+        var count;
+        if (item !== null && typeof item === "object" &&
+            Object.prototype.toString.call(item) !== "[object Array]" &&
+            ("emoji" in item || "count" in item)) {
+          emoji = item.emoji;
+          count = item.count;
+        } else if (Object.prototype.toString.call(item) === "[object Array]") {
+          emoji = item[0];
+          count = item[1];
+        } else {
+          emoji = item;
+          count = 0;
+        }
+        wrapped.push({ item: item, emoji: emoji, count: Number(count) || 0, idx: i });
+      }
+      wrapped.sort(function (a, b) {
+        if (b.count !== a.count) { return b.count - a.count; }
+        var oa = (a.emoji in order) ? order[a.emoji] : app.emojiSet.length + a.idx;
+        var ob = (b.emoji in order) ? order[b.emoji] : app.emojiSet.length + b.idx;
+        return oa - ob;
+      });
+      var out = [];
+      for (i = 0; i < wrapped.length; i++) { out.push(wrapped[i].item); }
+      return out;
+    },
+    debounce: function (fn, wait) {
+      var timer = null;
+      var delay = typeof wait === "number" ? wait : 200;
+      function debounced() {
+        var self = this;
+        var args = arguments;
+        if (timer !== null) { clearTimeout(timer); }
+        timer = setTimeout(function () {
+          timer = null;
+          fn.apply(self, args);
+        }, delay);
+      }
+      debounced.cancel = function () {
+        if (timer !== null) { clearTimeout(timer); timer = null; }
+      };
+      return debounced;
+    }
+  };
+
+  /* ---------- placeholder public methods ----------
+     Later chains replace these in place on the same object. */
+  var PLACEHOLDER_METHODS = [
+    "loadRange", "reload", "setRange", "loadComments", "classifyText",
+    "renderAll", "expandStory", "collapseStory", "searchSpread", "exportPNG"
+  ];
+  for (var pi = 0; pi < PLACEHOLDER_METHODS.length; pi++) {
+    (function (methodName) {
+      if (typeof app[methodName] !== "function") {
+        app[methodName] = function () {
+          app.state.lastError = "app." + methodName + " is not wired yet";
+          app.emit("sentiment:error", { method: methodName });
+          return null;
+        };
+      }
+    })(PLACEHOLDER_METHODS[pi]);
+  }
+
+  /* ---------- console friendly alias ---------- */
+  w.hnEmoji = app;
+
+  /* ---------- announce namespace ---------- */
+  app.emit("sentiment:namespace", app);
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "init", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- element handles ---------- */
+  var startInput = document.getElementById("start-date");
+  var endInput = document.getElementById("end-date");
+  var submitBtn = document.getElementById("submit-btn");
+  var statusEl = document.getElementById("status");
+  var topbar = document.getElementById("topbar");
+
+  function setStatus(message) {
+    if (statusEl) { statusEl.textContent = message; }
+  }
+
+  /* ---------- never allow a native submit / page reload from the header ---------- */
+  if (topbar) {
+    topbar.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+    });
+  }
+
+  /* ---------- default dates early, but never auto submit ---------- */
+  if (startInput && !startInput.value) {
+    var weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    startInput.value = app.util.localDateString(weekAgo);
+  }
+  if (endInput && !endInput.value) {
+    endInput.value = app.util.localDateString(new Date());
+  }
+  setStatus("ready");
+
+  /* ---------- hit normalization ---------- */
+  function normalizeHit(hit) {
+    var id = String(hit.objectID);
+    var points = hit.points || 0;
+    var hn = new URL("https://news.ycombinator.com/item");
+    hn.searchParams.set("id", id);
+    return {
+      id: id,
+      title: hit.title,
+      url: hit.url,
+      hnUrl: hn.toString(),
+      points: points,
+      numComments: hit.num_comments || 0,
+      author: hit.author,
+      createdAt: hit.created_at_i,
+      storyText: hit.story_text || "",
+      frontPage: points >= app.config.frontPageMinPoints,
+      raw: hit
+    };
+  }
+
+  /* ---------- app.loadRange: fetch stories for a date range ---------- */
+  app.loadRange = async function (startValue, endValue) {
+    app.state.loading = true;
+    app.state.lastError = null;
+    setStatus("loading stories");
+    app.emit("sentiment:stories-loading", { start: startValue, end: endValue });
+
+    /* mutate range in place; clear old stories so a rerun clears old cards */
+    app.state.range.start = startValue;
+    app.state.range.end = endValue;
+    app.state.stories = [];
+
+    try {
+      var startUnix = app.util.toUnixSeconds(startValue);
+      var endUnix = app.util.endOfDayUnixSeconds(endValue);
+      if (startUnix === null || endUnix === null) {
+        throw new Error("invalid date range");
+      }
+
+      var url = new URL(app.config.algoliaBase + "search_by_date");
+      url.searchParams.set("tags", app.config.storyTag);
+      url.searchParams.set(
+        "numericFilters",
+        "created_at_i>" + startUnix + ",created_at_i<" + endUnix
+      );
+
+      var page = 0;
+      while (app.state.stories.length < app.config.maxStories) {
+        url.searchParams.set("page", String(page));
+
+        var response = await fetch(url.toString(), { method: "GET" });
+        if (!response.ok) {
+          throw new Error("request failed: HTTP " + response.status);
+        }
+        var data = await response.json();
+        var hits = (data && data.hits) || [];
+
+        for (var i = 0; i < hits.length; i++) {
+          var story = normalizeHit(hits[i]);
+          app.state.stories.push(story);
+          app.emit("sentiment:story", story);
+        }
+
+        setStatus(
+          app.state.stories.length + " stories · " + startValue + " → " + endValue
+        );
+
+        var currentPage = (data && typeof data.page === "number") ? data.page : page;
+        var morePages = (data && typeof data.nbPages === "number")
+          ? (currentPage + 1 < data.nbPages)
+          : false;
+
+        page++;
+        if (!morePages || hits.length === 0) { break; }
+      }
+
+      app.emit("sentiment:stories", app.state.stories);
+    } catch (err) {
+      var message = (err && err.message) ? err.message : String(err);
+      app.state.lastError = message;
+      setStatus(message);
+      app.emit("sentiment:error", { method: "loadRange", error: message });
+    }
+
+    app.state.loading = false;
+    return app.state.stories;
+  };
+
+  /* ---------- app.setRange: write inputs, mutate state, return range ---------- */
+  app.setRange = function (startValue, endValue) {
+    if (startInput && startValue !== undefined) { startInput.value = startValue; }
+    if (endInput && endValue !== undefined) { endInput.value = endValue; }
+    app.state.range.start = startInput ? startInput.value : startValue;
+    app.state.range.end = endInput ? endInput.value : endValue;
+    return app.state.range;
+  };
+
+  /* ---------- app.reload: rerun with current range ---------- */
+  app.reload = function () {
+    return app.loadRange(app.state.range.start, app.state.range.end);
+  };
+
+  /* ---------- header wiring ---------- */
+  function runFromInputs() {
+    var startValue = startInput ? startInput.value : "";
+    var endValue = endInput ? endInput.value : "";
+    app.loadRange(startValue, endValue);
+  }
+
+  if (submitBtn) {
+    submitBtn.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      runFromInputs();
+    });
+  }
+
+  function onEnterKey(ev) {
+    var key = ev.key || ev.keyCode;
+    if (key === "Enter" || key === 13) {
+      ev.preventDefault();
+      runFromInputs();
+    }
+  }
+  if (startInput) { startInput.addEventListener("keydown", onEnterKey); }
+  if (endInput) { endInput.addEventListener("keydown", onEnterKey); }
+
+  /* intentionally no auto-load on script init */
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "loadComments", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  var statusEl = document.getElementById("status");
+
+  function setStatus(message) {
+    if (statusEl) { statusEl.textContent = message; }
+  }
+
+  /* ---------- app.loadComments: fetch full item tree per story,
+     flatten top-level comments into global rows ---------- */
+  app.loadComments = async function (stories) {
+    if (stories === undefined || stories === null) { stories = app.state.stories; }
+    if (!stories || typeof stories.length !== "number" || stories.length === 0) {
+      setStatus("no stories to scan");
+      return [];
+    }
+
+    app.state.loading = true;
+    app.state.lastError = null;
+
+    /* reset derived comment state before fetching */
+    app.state.commentRows = [];
+    app.state.storyTop = {};
+    app.state.globalTop = [];
+
+    var total = stories.length;
+    setStatus("loading comments 0 of " + total);
+    app.emit("sentiment:comments-loading", { count: total });
+
+    for (var i = 0; i < stories.length; i++) {
+      var story = stories[i];
+      try {
+        var response = await fetch(app.config.algoliaBase + "items/" + story.id, { method: "GET" });
+        if (!response.ok) {
+          throw new Error("request failed: HTTP " + response.status);
+        }
+        var item = await response.json();
+        var children = (item && item.children) || [];
+
+        /* order comments by createdAt ascending inside this story */
+        var sorted = children.slice();
+        sorted.sort(function (a, b) {
+          return ((a && a.created_at_i) || 0) - ((b && b.created_at_i) || 0);
+        });
+
+        for (var j = 0; j < sorted.length; j++) {
+          var child = sorted[j] || {};
+          var row = {
+            storyId: story.id,
+            storyTitle: story.title,
+            storyUrl: story.url,
+            hnUrl: story.hnUrl,
+            storyPoints: story.points,
+            storyCreatedAt: story.createdAt,
+            commentId: String(child.id),
+            author: child.author || "",
+            text: child.text || "",
+            createdAt: child.created_at_i || 0,
+            replyCount: (child.children && child.children.length) || 0,
+            emoji: null,
+            raw: child
+          };
+          app.state.commentRows.push(row);
+          app.emit("sentiment:comment-row", row);
+        }
+      } catch (err) {
+        var message = (err && err.message) ? err.message : String(err);
+        app.state.lastError = message;
+        app.emit("sentiment:error", { method: "loadComments", storyId: story.id, error: message });
+        /* continue with the next story */
+      }
+
+      setStatus("loading comments " + (i + 1) + " of " + total);
+      app.emit("sentiment:comments-progress", {
+        done: i + 1,
+        total: total,
+        rows: app.state.commentRows.length
+      });
+    }
+
+    app.state.loading = false;
+    setStatus(app.state.commentRows.length + " comment rows loaded");
+    app.emit("sentiment:comments", app.state.commentRows);
+    return app.state.commentRows;
+  };
+
+  /* ---------- auto-pull comments after a fresh date run ---------- */
+  app.on("sentiment:stories", function (detail) {
+    app.loadComments(detail);
+  });
+
+  /* ---------- repeated runs: clear derived state before new fetches ---------- */
+  app.on("sentiment:stories-loading", function () {
+    app.state.commentRows = [];
+    app.state.storyTop = {};
+    app.state.globalTop = [];
+  });
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "render", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- constants + element handles ---------- */
+  var PENDING_EMOJI = "⏳️";
+  var PENDING_LABEL = "pending";
+
+  var storyListEl = document.getElementById("story-list");
+  var summaryEl = document.getElementById("global-emoji-summary");
+  var summaryTitleEl = summaryEl ? summaryEl.querySelector(".summary-title") : null;
+  var globalSlots = summaryEl ? summaryEl.querySelectorAll(".global-emoji-slot") : [];
+  var globalCounts = summaryEl ? summaryEl.querySelectorAll(".global-emoji-count") : [];
+  var statusEl = document.getElementById("status");
+  var storyTemplate = document.getElementById("story-row-template");
+  var commentTemplate = document.getElementById("comment-row-template");
+
+  /* ---------- local render registry: story id -> rendered card element ---------- */
+  var cardById = new Map();
+
+  /* ---------- expanded set: lives on app.state, always mutated in place ---------- */
+  function expandedSet() {
+    var set = app.state._expanded;
+    if (!set || typeof set.has !== "function" || typeof set.add !== "function") {
+      set = new Set();
+      app.state._expanded = set;
+    }
+    return set;
+  }
+  expandedSet();
+
+  /* ---------- small helpers ---------- */
+  function formatCreated(unixSeconds) {
+    if (!unixSeconds) { return "unknown date"; }
+    return app.util.localDateString(new Date(unixSeconds * 1000));
+  }
+
+  function storyLoadedCount(storyId) {
+    var rows = app.state.commentRows || [];
+    var n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i].storyId) === String(storyId)) { n++; }
+    }
+    return n;
+  }
+
+  /* normalize storyTop / globalTop entries into [{emoji,count}] (max 3),
+     returning null when there is nothing classified yet */
+  function normalizeTopEntries(top) {
+    if (!top) { return null; }
+    var sorted = app.util.sortEmojiCounts(top);
+    var out = [];
+    for (var i = 0; i < sorted.length && out.length < 3; i++) {
+      var item = sorted[i];
+      var emoji = null;
+      var count = 0;
+      if (item !== null && typeof item === "object" &&
+          Object.prototype.toString.call(item) !== "[object Array]") {
+        emoji = item.emoji;
+        count = Number(item.count) || 0;
+      } else if (Object.prototype.toString.call(item) === "[object Array]") {
+        emoji = item[0];
+        count = Number(item[1]) || 0;
+      }
+      if (emoji) { out.push({ emoji: emoji, count: count }); }
+    }
+    return out.length > 0 ? out : null;
+  }
+
+  /* ---------- global summary strip ---------- */
+  function renderGlobalSummary() {
+    var rows = app.state.commentRows || [];
+    if (summaryTitleEl) {
+      summaryTitleEl.textContent = "All comments: " + rows.length;
+    }
+    var top = normalizeTopEntries(app.state.globalTop);
+    for (var i = 0; i < globalSlots.length; i++) {
+      var entry = top && i < top.length ? top[i] : null;
+      globalSlots[i].textContent = entry ? entry.emoji : PENDING_EMOJI;
+      if (globalCounts[i]) {
+        globalCounts[i].textContent = entry ? String(entry.count) : PENDING_LABEL;
+      }
+    }
+  }
+
+  /* ---------- empty / loading messages for the story list ---------- */
+  var emptyEl = null;
+  function showListMessage(text) {
+    if (!storyListEl) { return; }
+    if (!emptyEl) {
+      emptyEl = document.createElement("p");
+      emptyEl.className = "spread-empty";
+    }
+    emptyEl.textContent = text;
+    if (emptyEl.parentNode !== storyListEl) { storyListEl.appendChild(emptyEl); }
+  }
+  function clearListMessage() {
+    if (emptyEl && emptyEl.parentNode) { emptyEl.parentNode.removeChild(emptyEl); }
+  }
+  function updateEmptyState() {
+    var has = app.state.stories && app.state.stories.length > 0;
+    if (has) { clearListMessage(); }
+    else { showListMessage("No stories to show. Pick a date range above and press Run."); }
+  }
+
+  /* ---------- card part renderers (textContent / escaped only) ---------- */
+  function renderCardMeta(card, story) {
+    var metaEl = card.querySelector(".story-meta");
+    if (!metaEl) { return; }
+    metaEl.textContent = "";
+    var parts = [];
+    parts.push((story.points || 0) + " points");
+    parts.push("by " + (story.author || "anonymous"));
+    var commentsPart = (story.numComments || 0) + " comments";
+    var loaded = storyLoadedCount(story.id);
+    if (loaded > 0) { commentsPart += " (" + loaded + " loaded)"; }
+    parts.push(commentsPart);
+    parts.push(formatCreated(story.createdAt));
+    metaEl.appendChild(document.createTextNode(parts.join(" · ")));
+    if (story.frontPage) {
+      var badge = document.createElement("span");
+      badge.className = "frontpage-badge";
+      badge.textContent = "front page";
+      badge.style.color = "#ff6600";
+      badge.style.border = "1px solid #ff6600";
+      badge.style.borderRadius = "999px";
+      badge.style.padding = "0 6px";
+      badge.style.marginLeft = "6px";
+      badge.style.fontSize = "10px";
+      badge.style.fontWeight = "700";
+      badge.style.letterSpacing = ".05em";
+      badge.style.textTransform = "uppercase";
+      metaEl.appendChild(badge);
+    }
+  }
+
+  function fillStorySlot(slotEl, entry) {
+    slotEl.textContent = "";
+    slotEl.appendChild(document.createTextNode(entry ? entry.emoji : PENDING_EMOJI));
+    var countEl = document.createElement("span");
+    countEl.className = "story-emoji-count";
+    countEl.textContent = entry ? String(entry.count) : PENDING_LABEL;
+    slotEl.appendChild(countEl);
+  }
+
+  function renderCardSlots(card, story) {
+    var slots = card.querySelectorAll(".story-emoji-slot");
+    var top = normalizeTopEntries(app.state.storyTop ? app.state.storyTop[story.id] : null);
+    for (var i = 0; i < slots.length; i++) {
+      fillStorySlot(slots[i], top && i < top.length ? top[i] : null);
+    }
+  }
+
+  function renderCommentRow(row) {
+    if (!commentTemplate) { return null; }
+    var node = commentTemplate.content.firstElementChild.cloneNode(true);
+
+    var emojiEl = node.querySelector(".comment-emoji");
+    if (emojiEl) { emojiEl.textContent = row.emoji || PENDING_EMOJI; }
+
+    var authorEl = node.querySelector(".comment-author");
+    if (authorEl) { authorEl.textContent = row.author || "anonymous"; }
+
+    var textEl = node.querySelector(".comment-text");
+    if (textEl) {
+      textEl.textContent = "";
+      /* escaped text, basic line breaks preserved: paragraph / br tags and
+         newlines become visible breaks, everything else stays escaped */
+      var raw = row.text === null || row.text === undefined ? "" : String(row.text);
+      raw = raw.replace(/<p\s*\/?>/gi, "\n").replace(/<br\s*\/?>/gi, "\n");
+      var lines = raw.split(/\r\n|\r|\n/);
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < lines.length; i++) {
+        if (i > 0) { frag.appendChild(document.createElement("br")); }
+        frag.appendChild(document.createTextNode(lines[i]));
+      }
+      if (row.replyCount > 0) {
+        var replies = document.createElement("span");
+        replies.className = "comment-replies";
+        replies.textContent = "  · " + row.replyCount + (row.replyCount === 1 ? " reply" : " replies");
+        replies.style.color = "#8b949e";
+        replies.style.fontSize = "11px";
+        frag.appendChild(replies);
+      }
+      textEl.appendChild(frag);
+    }
+    return node;
+  }
+
+  function renderCommentsInto(commentsEl, storyId) {
+    commentsEl.textContent = "";
+    var rows = app.state.commentRows || [];
+    var frag = document.createDocumentFragment();
+    var count = 0;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i].storyId) === String(storyId)) {
+        var node = renderCommentRow(rows[i]);
+        if (node) { frag.appendChild(node); count++; }
+      }
+    }
+    if (count === 0) {
+      var note = document.createElement("p");
+      note.className = "spread-empty comments-empty";
+      note.textContent = app.state.loading ? "Loading comments…" : "No top-level comments loaded.";
+      frag.appendChild(note);
+    }
+    commentsEl.appendChild(frag);
+  }
+
+  /* ---------- fill an existing card in place from app.state data ---------- */
+  function fillCard(card, story) {
+    card._story = story;
+
+    var titleEl = card.querySelector(".story-title");
+    if (titleEl) {
+      var link = document.createElement("a");
+      link.className = "story-title";
+      link.href = story.url || story.hnUrl || "#";
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = story.title || "(untitled)";
+      titleEl.parentNode.replaceChild(link, titleEl);
+    }
+
+    renderCardMeta(card, story);
+    renderCardSlots(card, story);
+
+    var isOpen = expandedSet().has(String(story.id));
+    if (isOpen) { card.classList.add("open"); }
+    else { card.classList.remove("open"); }
+    var commentsEl = card.querySelector(".story-comments");
+    if (commentsEl) {
+      if (isOpen) { renderCommentsInto(commentsEl, story.id); }
+      else { commentsEl.textContent = ""; }
+    }
+  }
+
+  /* ---------- renderStoryCard: clone template, fill, wire toggle ---------- */
+  function renderStoryCard(story) {
+    if (!storyTemplate) { return null; }
+    var card = storyTemplate.content.firstElementChild.cloneNode(true);
+    card.setAttribute("data-story-id", String(story.id));
+    fillCard(card, story);
+
+    var head = card.querySelector(".story-head");
+    if (head) {
+      head.addEventListener("click", function (ev) {
+        ev.preventDefault(); /* also stops links inside the head from navigating */
+        var set = expandedSet();
+        var id = String(story.id);
+        if (set.has(id)) { app.collapseStory(id); }
+        else { app.expandStory(id); }
+      });
+    }
+    return card;
+  }
+
+  /* ---------- update only one card's expansion state ---------- */
+  function refreshCardExpansion(storyId) {
+    var card = cardById.get(String(storyId));
+    if (!card) { return; }
+    var isOpen = expandedSet().has(String(storyId));
+    if (isOpen) { card.classList.add("open"); }
+    else { card.classList.remove("open"); }
+    var commentsEl = card.querySelector(".story-comments");
+    if (!commentsEl) { return; }
+    if (isOpen) { renderCommentsInto(commentsEl, storyId); }
+    else { commentsEl.textContent = ""; }
+  }
+
+  /* ---------- expand / collapse: mutate app.state._expanded in place ---------- */
+  app.expandStory = function expandStory(storyId) {
+    var id = String(storyId);
+    var set = expandedSet();
+    if (!set.has(id)) { set.add(id); }
+    refreshCardExpansion(id);
+    return app.state._expanded;
+  };
+
+  app.collapseStory = function collapseStory(storyId) {
+    var id = String(storyId);
+    var set = expandedSet();
+    if (set.has(id)) { set.delete(id); }
+    refreshCardExpansion(id);
+    return app.state._expanded;
+  };
+
+  /* ---------- insert a card so the list matches app.state.stories order ---------- */
+  function insertCardInOrder(card, story) {
+    if (!storyListEl) { return; }
+    var stories = app.state.stories || [];
+    var idx = -1;
+    var i;
+    for (i = 0; i < stories.length; i++) {
+      if (String(stories[i].id) === String(story.id)) { idx = i; break; }
+    }
+    var reference = null;
+    if (idx >= 0) {
+      for (i = idx + 1; i < stories.length; i++) {
+        var later = cardById.get(String(stories[i].id));
+        if (later && later.parentNode === storyListEl && later !== card) {
+          reference = later;
+          break;
+        }
+      }
+    }
+    if (reference) { storyListEl.insertBefore(card, reference); }
+    else { storyListEl.appendChild(card); }
+  }
+
+  function upsertStoryCard(story) {
+    if (!storyListEl) { return; }
+    var id = String(story.id);
+    var card = cardById.get(id);
+    if (card) {
+      fillCard(card, story);
+    } else {
+      card = renderStoryCard(story);
+      if (!card) { return; }
+      cardById.set(id, card);
+    }
+    insertCardInOrder(card, story);
+    updateEmptyState();
+  }
+
+  /* ---------- reconcile the full list against app.state.stories ---------- */
+  function reconcileStoryList() {
+    if (!storyListEl) { return; }
+    var stories = app.state.stories || [];
+    var seen = {};
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < stories.length; i++) {
+      var story = stories[i];
+      if (!story) { continue; }
+      var id = String(story.id);
+      seen[id] = true;
+      var card = cardById.get(id);
+      if (card) { fillCard(card, story); }
+      else {
+        card = renderStoryCard(story);
+        if (card) { cardById.set(id, card); }
+      }
+      if (card) { frag.appendChild(card); } /* moves existing nodes into order */
+    }
+    cardById.forEach(function (oldCard, oldId) {
+      if (!seen[oldId]) {
+        if (oldCard.parentNode) { oldCard.parentNode.removeChild(oldCard); }
+        cardById.delete(oldId);
+      }
+    });
+    storyListEl.appendChild(frag);
+    updateEmptyState();
+  }
+
+  /* ---------- app.renderAll: reads only app.state + templates ---------- */
+  app.renderAll = function renderAll() {
+    renderGlobalSummary();
+    reconcileStoryList();
+    return app.state.stories;
+  };
+
+  /* ---------- incremental event wiring ---------- */
+
+  /* a story arrived (possibly mid-pagination): pop just that card in, in order */
+  app.on("sentiment:story", function (story) {
+    if (!story || story.id === undefined || story.id === null) { return; }
+    upsertStoryCard(story);
+  });
+
+  /* a comment row arrived: bump global count, story meta count, and append
+     the row only when that story is currently expanded */
+  app.on("sentiment:comment-row", function (row) {
+    if (!row) { return; }
+    if (summaryTitleEl) {
+      summaryTitleEl.textContent = "All comments: " + (app.state.commentRows || []).length;
+    }
+    var card = cardById.get(String(row.storyId));
+    if (card && card._story) {
+      renderCardMeta(card, card._story);
+    }
+    if (card && expandedSet().has(String(row.storyId))) {
+      var commentsEl = card.querySelector(".story-comments");
+      if (commentsEl) {
+        var note = commentsEl.querySelector(".comments-empty");
+        if (note && note.parentNode) { note.parentNode.removeChild(note); }
+        var node = renderCommentRow(row);
+        if (node) { commentsEl.appendChild(node); }
+      }
+    }
+  });
+
+  /* a rerun started: drop every rendered card so nothing duplicates */
+  app.on("sentiment:stories-loading", function () {
+    cardById.clear();
+    if (storyListEl) { storyListEl.textContent = ""; }
+    showListMessage("Loading stories…");
+  });
+
+  /* all pages for the range are in: reconcile order + empty state */
+  app.on("sentiment:stories", function () {
+    reconcileStoryList();
+    updateEmptyState();
+  });
+
+  /* comment scan finished: one full reconcile for final counts + expansions */
+  app.on("sentiment:comments", function () {
+    app.renderAll();
+  });
+
+  /* progress: status text only, no DOM rebuilding */
+  app.on("sentiment:comments-progress", function (detail) {
+    if (!statusEl || !detail) { return; }
+    statusEl.textContent = "loading comments " + detail.done + " of " + detail.total +
+      " · " + detail.rows + " rows";
+  });
+
+  /* ---------- initial paint: show whatever state already exists ---------- */
+  app.renderAll();
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "classifier-controls", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- element handles ---------- */
+  var rootEl = document.getElementById("postscope-root");
+  var modelInput = document.getElementById("llm-model");
+  var endpointInput = document.getElementById("llm-endpoint");
+  var keyInput = document.getElementById("llm-key");
+  var emojiInput = document.getElementById("emoji-set");
+  var statusEl = document.getElementById("classifier-status");
+
+  /* ---------- storage key contract: namespaced overrides ---------- */
+  app.config.storageKeys = {
+    model: "sentiment.hackernews.m",
+    endpoint: "sentiment.hackernews.h",
+    key: "sentiment.hackernews.k",
+    emojis: "sentiment.hackernews.emojis"
+  };
+
+  var DEFAULT_EMOJI_SET = ["😊", "😡", "😂", "🤔", "😢", "😮", "💀"];
+
+  /* ---------- storage helpers ----------
+     readNs: stored value or empty string.
+     writeNs: empty value removes the key so blank means inherit global. */
+  function readNs(name) {
+    try {
+      var raw = w.localStorage ? w.localStorage.getItem(name) : null;
+      return raw === null || raw === undefined ? "" : String(raw);
+    } catch (err) {
+      return "";
+    }
+  }
+
+  function writeNs(name, value) {
+    try {
+      var ls = w.localStorage;
+      if (!ls) { return; }
+      var v = value === null || value === undefined ? "" : String(value);
+      if (v === "") { ls.removeItem(name); }
+      else { ls.setItem(name, v); }
+    } catch (err) { /* storage unavailable */ }
+  }
+
+  /* ---------- app.getClassifierConfig: override -> global -> none ----------
+     globals come only from bare localStorage keys "m", "h", "k". */
+  app.getClassifierConfig = function () {
+    var keys = app.config.storageKeys;
+    var nsModel = readNs(keys.model);
+    var nsEndpoint = readNs(keys.endpoint);
+    var nsKey = readNs(keys.key);
+    var gModel = readNs("m");
+    var gEndpoint = readNs("h");
+    var gKey = readNs("k");
+    return {
+      model: nsModel || gModel,
+      endpoint: nsEndpoint || gEndpoint,
+      key: nsKey || gKey,
+      modelSource: nsModel ? "override" : (gModel ? "global" : "none"),
+      endpointSource: nsEndpoint ? "override" : (gEndpoint ? "global" : "none"),
+      keySource: nsKey ? "override" : (gKey ? "global" : "none")
+    };
+  };
+
+  /* ---------- emoji parsing: whitespace split + dedupe ---------- */
+  function parseEmojis(raw) {
+    var out = [];
+    if (raw === null || raw === undefined) { return out; }
+    var parts = String(raw).split(/\s+/);
+    for (var i = 0; i < parts.length; i++) {
+      var token = parts[i];
+      if (token && out.indexOf(token) === -1) { out.push(token); }
+    }
+    return out;
+  }
+
+  /* ---------- app.getEmojiSet: ns override -> root attribute -> default ---------- */
+  app.getEmojiSet = function () {
+    var parsed = parseEmojis(readNs(app.config.storageKeys.emojis));
+    if (parsed.length >= 2) { return parsed; }
+    var root = rootEl || document.getElementById("postscope-root");
+    if (root) {
+      parsed = parseEmojis(root.getAttribute("data-emoji-set"));
+      if (parsed.length >= 2) { return parsed; }
+    }
+    return DEFAULT_EMOJI_SET.slice();
+  };
+
+  /* ---------- classifier status line ---------- */
+  function sourceStatusText() {
+    var cfg = app.getClassifierConfig();
+    return "model: " + cfg.modelSource +
+      " · endpoint: " + cfg.endpointSource +
+      " · key: " + cfg.keySource;
+  }
+
+  function setClassifierStatus(text) {
+    if (statusEl) { statusEl.textContent = text; }
+  }
+
+  /* ---------- populate controls from storage (emits nothing) ---------- */
+  function applyControlValues() {
+    var keys = app.config.storageKeys;
+    var gModel = readNs("m");
+    var gEndpoint = readNs("h");
+    var gKey = readNs("k");
+
+    if (modelInput) {
+      modelInput.value = readNs(keys.model); /* namespaced override only */
+      modelInput.setAttribute("placeholder", gModel ? gModel : "no global model");
+    }
+    if (endpointInput) {
+      endpointInput.value = readNs(keys.endpoint); /* namespaced override only */
+      endpointInput.setAttribute("placeholder", gEndpoint ? gEndpoint : "no global endpoint");
+    }
+    if (keyInput) {
+      keyInput.value = readNs(keys.key); /* override only, never filled from global */
+      keyInput.setAttribute("placeholder", gKey ? "global key present" : "no global key");
+    }
+    if (emojiInput) {
+      emojiInput.value = app.getEmojiSet().join(" ");
+    }
+  }
+
+  /* ---------- app.refreshClassifierControls: re-read storage, no events ---------- */
+  app.refreshClassifierControls = function () {
+    applyControlValues();
+    setClassifierStatus(sourceStatusText());
+    return app.getClassifierConfig();
+  };
+
+  /* ---------- llm override fields: persist + report on edit ---------- */
+  function commitField(storageName, value) {
+    writeNs(storageName, value);
+    setClassifierStatus(sourceStatusText());
+    app.emit("sentiment:classifier-config", app.getClassifierConfig());
+  }
+
+  function bindOverrideField(input, storageName) {
+    if (!input) { return; }
+    var debounced = null;
+    if (app.util && typeof app.util.debounce === "function") {
+      debounced = app.util.debounce(function (value) {
+        commitField(storageName, value);
+      }, 250);
+    }
+    input.addEventListener("input", function () {
+      if (debounced) { debounced(input.value); }
+      else { commitField(storageName, input.value); }
+    });
+    input.addEventListener("change", function () {
+      /* flush the final value immediately on change */
+      if (debounced && typeof debounced.cancel === "function") { debounced.cancel(); }
+      commitField(storageName, input.value);
+    });
+  }
+
+  bindOverrideField(modelInput, app.config.storageKeys.model);
+  bindOverrideField(endpointInput, app.config.storageKeys.endpoint);
+  bindOverrideField(keyInput, app.config.storageKeys.key);
+
+  /* ---------- key field: plaintext storage warning on focus or change ---------- */
+  if (keyInput) {
+    var warnPlaintextKey = function () {
+      setClassifierStatus("key is stored plaintext in localStorage");
+    };
+    keyInput.addEventListener("focus", warnPlaintextKey);
+    keyInput.addEventListener("change", warnPlaintextKey);
+  }
+
+  /* ---------- emoji set field: validate, persist, broadcast ---------- */
+  if (emojiInput) {
+    emojiInput.addEventListener("change", function () {
+      var parsed = parseEmojis(emojiInput.value);
+      if (parsed.length < 2) {
+        emojiInput.value = app.getEmojiSet().join(" ");
+        setClassifierStatus("need at least 2 emojis");
+        return;
+      }
+      var joined = parsed.join(" ");
+      emojiInput.value = joined;
+      writeNs(app.config.storageKeys.emojis, joined);
+
+      var root = rootEl || document.getElementById("postscope-root");
+      if (root) { root.setAttribute("data-emoji-set", joined); }
+
+      /* keep the shared emoji set mutated in place so ordering stays live */
+      if (app.emojiSet && typeof app.emojiSet.length === "number") {
+        app.emojiSet.length = 0;
+        for (var i = 0; i < parsed.length; i++) { app.emojiSet.push(parsed[i]); }
+      } else {
+        app.emojiSet = parsed.slice();
+      }
+
+      setClassifierStatus("emoji set saved");
+      app.emit("sentiment:emoji-set", parsed);
+      if (typeof app.renderAll === "function") {
+        try { app.renderAll(); } catch (err) { /* best effort repaint */ }
+      }
+    });
+  }
+
+  /* ---------- initial paint: values, placeholders, one status line ---------- */
+  applyControlValues();
+  setClassifierStatus(sourceStatusText());
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "cache", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- constants ---------- */
+  var DB_NAME = "sentiment/hackernews_cache";
+  var DB_VERSION = 1;
+  var STORE = "emoji";
+
+  /* ---------- config defaults (fill missing keys only) ---------- */
+  if (app.config.cacheMax === undefined) { app.config.cacheMax = 5000; }
+  if (app.config.classifierVersion === undefined) { app.config.classifierVersion = "clsV1"; }
+
+  /* ---------- keep the existing cache object identity, mutate in place ---------- */
+  var cache = app.cache;
+  var statusEl = document.getElementById("classifier-status");
+
+  var memory = (cache.memory && typeof cache.memory.has === "function") ? cache.memory : new Map();
+  cache.memory = memory;
+
+  if (typeof cache.stableHash !== "function") {
+    cache.stableHash = function (text) {
+      var s = String(text === null || text === undefined ? "" : text);
+      var h1 = 5381;
+      var h2 = 52711;
+      for (var i = 0; i < s.length; i++) {
+        var c = s.charCodeAt(i);
+        h1 = (((h1 << 5) + h1) + c) | 0;
+        h2 = (((h2 << 5) + h2) ^ c) | 0;
+      }
+      return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36);
+    };
+  }
+  var stableHash = cache.stableHash;
+
+  var db = null;
+  var mode = "fallback";
+
+  function setStatus(text) {
+    if (statusEl) { statusEl.textContent = text; }
+  }
+
+  function enterFallback(message) {
+    mode = "fallback";
+    setStatus("cache fallback mode");
+    if (typeof app.emit === "function") {
+      app.emit("sentiment:error", { method: "cache", error: message });
+    }
+  }
+
+  function errMessage(err, fallbackText) {
+    if (err && err.message) { return err.message; }
+    if (err) { return String(err); }
+    return fallbackText;
+  }
+
+  /* ---------- localStorage fallback helpers ----------
+     cache entries live under app.config.cachePrefix; settings keys
+     ("sentiment.hackernews.*", "m", "h", "k") are never touched. */
+  function lsKey(key) { return app.config.cachePrefix + key; }
+
+  function lsGet(key) {
+    try {
+      var ls = w.localStorage;
+      if (!ls) { return null; }
+      var raw = ls.getItem(lsKey(key));
+      if (raw === null || raw === undefined) { return null; }
+      return JSON.parse(raw);
+    } catch (err) { return null; }
+  }
+
+  function lsSet(key, value) {
+    try {
+      var ls = w.localStorage;
+      if (ls) { ls.setItem(lsKey(key), JSON.stringify(value)); }
+    } catch (err) { /* storage unavailable or full; memory copy survives */ }
+  }
+
+  function lsSetPairs(pairs) {
+    for (var i = 0; i < pairs.length; i++) { lsSet(pairs[i][0], pairs[i][1]); }
+  }
+
+  function lsFillMisses(misses, out) {
+    for (var i = 0; i < misses.length; i++) {
+      if (!out.has(misses[i])) {
+        var v = lsGet(misses[i]);
+        if (v !== null && v !== undefined) {
+          memory.set(misses[i], v);
+          out.set(misses[i], v);
+        }
+      }
+    }
+  }
+
+  function lsHas(key) {
+    try {
+      var ls = w.localStorage;
+      return ls ? ls.getItem(lsKey(key)) !== null : false;
+    } catch (err) { return false; }
+  }
+
+  function lsClearPrefix() {
+    try {
+      var ls = w.localStorage;
+      if (!ls) { return; }
+      var prefix = app.config.cachePrefix;
+      var doomed = [];
+      for (var i = 0; i < ls.length; i++) {
+        var k = ls.key(i);
+        if (k !== null && k.indexOf(prefix) === 0) { doomed.push(k); }
+      }
+      for (var j = 0; j < doomed.length; j++) { ls.removeItem(doomed[j]); }
+    } catch (err) { /* storage unavailable */ }
+  }
+
+  /* ---------- ready promise: resolves "indexeddb" or "fallback" ---------- */
+  var resolveReady;
+  cache.ready = new Promise(function (resolve) { resolveReady = resolve; });
+  var readySettled = false;
+  function settleReady(m) {
+    if (readySettled) { return; }
+    readySettled = true;
+    mode = m;
+    if (typeof app.emit === "function") {
+      app.emit("sentiment:cache-ready", { mode: m });
+    }
+    resolveReady(m);
+  }
+
+  /* ---------- open the database ---------- */
+  function openDb() {
+    return new Promise(function (resolve, reject) {
+      var request;
+      try {
+        request = w.indexedDB.open(DB_NAME, DB_VERSION);
+      } catch (err) { reject(err); return; }
+      request.onupgradeneeded = function () {
+        try {
+          var database = request.result;
+          if (!database.objectStoreNames.contains(STORE)) {
+            var store = database.createObjectStore(STORE, { keyPath: "key" });
+            store.createIndex("ts", "ts", { unique: false });
+          }
+        } catch (err) { /* surfaced via request.onerror */ }
+      };
+      request.onsuccess = function () {
+        db = request.result;
+        resolve(true);
+      };
+      request.onerror = function () {
+        reject(request.error || new Error("indexeddb open failed"));
+      };
+    });
+  }
+
+  /* ---------- low level IndexedDB helpers (all failures fall back) ---------- */
+  function idbGetRecord(key) {
+    return new Promise(function (resolve) {
+      try {
+        var req = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
+        req.onsuccess = function () {
+          var rec = req.result;
+          resolve(rec && rec.value !== undefined ? rec.value : null);
+        };
+        req.onerror = function () {
+          enterFallback(errMessage(req.error, "indexeddb get failed"));
+          resolve(lsGet(key));
+        };
+      } catch (err) {
+        enterFallback(errMessage(err, "indexeddb get failed"));
+        resolve(lsGet(key));
+      }
+    });
+  }
+
+  function idbPutRecord(record) {
+    try {
+      var tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).put(record);
+      tx.onerror = function () {
+        enterFallback(errMessage(tx.error, "indexeddb put failed"));
+        lsSet(record.key, record.value);
+      };
+    } catch (err) {
+      enterFallback(errMessage(err, "indexeddb put failed"));
+      lsSet(record.key, record.value);
+    }
+  }
+
+  /* ---------- trim: keep the store at or under app.config.cacheMax ---------- */
+  function trimStore() {
+    if (mode !== "indexeddb" || !db) { return Promise.resolve(0); }
+    return new Promise(function (resolve) {
+      var removed = 0;
+      try {
+        var tx = db.transaction(STORE, "readwrite");
+        var store = tx.objectStore(STORE);
+        var countReq = store.count();
+        countReq.onsuccess = function () {
+          var excess = Number(countReq.result) - app.config.cacheMax;
+          if (!(excess > 0)) { return; }
+          var cursorReq = store.index("ts").openCursor(); /* ascending = oldest first */
+          cursorReq.onsuccess = function () {
+            var cursor = cursorReq.result;
+            if (cursor && excess > 0) {
+              memory.delete(cursor.primaryKey);
+              cursor.delete();
+              removed++;
+              excess--;
+              cursor.continue();
+            }
+          };
+        };
+        tx.oncomplete = function () { resolve(removed); };
+        tx.onerror = function () {
+          enterFallback(errMessage(tx.error, "indexeddb trim failed"));
+          resolve(removed);
+        };
+      } catch (err) {
+        enterFallback(errMessage(err, "indexeddb trim failed"));
+        resolve(removed);
+      }
+    });
+  }
+
+  /* ---------- generic get: memory first, then IndexedDB (or localStorage) ---------- */
+  cache.get = function (key) {
+    if (memory.has(key)) { return Promise.resolve(memory.get(key)); }
+    if (mode === "indexeddb" && db) {
+      return idbGetRecord(key).then(function (value) {
+        if (value !== null && value !== undefined) { memory.set(key, value); }
+        return value === undefined ? null : value;
+      });
+    }
+    var stored = lsGet(key);
+    if (stored !== null && stored !== undefined) {
+      memory.set(key, stored);
+      return Promise.resolve(stored);
+    }
+    return Promise.resolve(null);
+  };
+
+  /* ---------- generic set: memory first, then best effort IndexedDB put ---------- */
+  cache.set = function (key, value) {
+    if (value && typeof value.then === "function") {
+      return value.then(function (resolved) { return cache.set(key, resolved); });
+    }
+    memory.set(key, value);
+    if (mode === "indexeddb" && db) {
+      idbPutRecord({ key: key, value: value, ts: Date.now() });
+    } else {
+      lsSet(key, value);
+    }
+    return value;
+  };
+
+  /* ---------- getMany: Map of found entries, one transaction for misses ---------- */
+  cache.getMany = function (keys) {
+    var out = new Map();
+    var misses = [];
+    var list = [];
+    var i;
+    if (keys && typeof keys.length === "number") {
+      for (i = 0; i < keys.length; i++) { list.push(keys[i]); }
+    }
+    for (i = 0; i < list.length; i++) {
+      var k = list[i];
+      if (memory.has(k)) { out.set(k, memory.get(k)); }
+      else { misses.push(k); }
+    }
+    if (misses.length === 0) { return Promise.resolve(out); }
+    if (mode === "indexeddb" && db) {
+      return new Promise(function (resolve) {
+        var settled = false;
+        function finish() {
+          if (!settled) { settled = true; resolve(out); }
+        }
+        try {
+          var tx = db.transaction(STORE, "readonly");
+          var store = tx.objectStore(STORE);
+          tx.oncomplete = function () { finish(); };
+          tx.onerror = function () {
+            enterFallback(errMessage(tx.error, "indexeddb getMany failed"));
+            lsFillMisses(misses, out);
+            finish();
+          };
+          for (var i = 0; i < misses.length; i++) {
+            (function (k) {
+              var req = store.get(k);
+              req.onsuccess = function () {
+                var rec = req.result;
+                if (rec && rec.value !== undefined) {
+                  memory.set(k, rec.value);
+                  out.set(k, rec.value);
+                }
+              };
+            })(misses[i]);
+          }
+        } catch (err) {
+          enterFallback(errMessage(err, "indexeddb getMany failed"));
+          lsFillMisses(misses, out);
+          finish();
+        }
+      });
+    }
+    lsFillMisses(misses, out);
+    return Promise.resolve(out);
+  };
+
+  /* ---------- setMany: Map or array of pairs, memory first, one transaction ---------- */
+  function toPairs(entries) {
+    var pairs = [];
+    if (!entries) { return pairs; }
+    if (entries instanceof Map) {
+      entries.forEach(function (value, key) { pairs.push([key, value]); });
+    } else if (Object.prototype.toString.call(entries) === "[object Array]") {
+      for (var i = 0; i < entries.length; i++) {
+        var pair = entries[i];
+        if (pair && pair.length >= 2) { pairs.push([pair[0], pair[1]]); }
+      }
+    }
+    return pairs;
+  }
+
+  cache.setMany = function (entries) {
+    var pairs = toPairs(entries);
+    var now = Date.now();
+    for (var i = 0; i < pairs.length; i++) { memory.set(pairs[i][0], pairs[i][1]); }
+    if (mode === "indexeddb" && db) {
+      return new Promise(function (resolve) {
+        try {
+          var tx = db.transaction(STORE, "readwrite");
+          var store = tx.objectStore(STORE);
+          for (var i = 0; i < pairs.length; i++) {
+            store.put({ key: pairs[i][0], value: pairs[i][1], ts: now });
+          }
+          tx.oncomplete = function () {
+            /* best effort trim after a batch write */
+            trimStore().then(
+              function () { resolve(pairs.length); },
+              function () { resolve(pairs.length); }
+            );
+          };
+          tx.onerror = function () {
+            enterFallback(errMessage(tx.error, "indexeddb setMany failed"));
+            lsSetPairs(pairs);
+            resolve(pairs.length);
+          };
+        } catch (err) {
+          enterFallback(errMessage(err, "indexeddb setMany failed"));
+          lsSetPairs(pairs);
+          resolve(pairs.length);
+        }
+      });
+    }
+    lsSetPairs(pairs);
+    return Promise.resolve(pairs.length);
+  };
+
+  /* ---------- has: across memory and IndexedDB ---------- */
+  cache.has = function (key) {
+    if (memory.has(key)) { return Promise.resolve(true); }
+    if (mode === "indexeddb" && db) {
+      return new Promise(function (resolve) {
+        try {
+          var req = db.transaction(STORE, "readonly").objectStore(STORE).getKey(key);
+          req.onsuccess = function () { resolve(req.result !== undefined); };
+          req.onerror = function () {
+            enterFallback(errMessage(req.error, "indexeddb has failed"));
+            resolve(lsHas(key));
+          };
+        } catch (err) {
+          enterFallback(errMessage(err, "indexeddb has failed"));
+          resolve(lsHas(key));
+        }
+      });
+    }
+    return Promise.resolve(lsHas(key));
+  };
+
+  /* ---------- clear: emoji store + memory only, never localStorage settings ---------- */
+  cache.clear = function () {
+    memory.clear();
+    if (mode === "indexeddb" && db) {
+      return new Promise(function (resolve) {
+        try {
+          var tx = db.transaction(STORE, "readwrite");
+          tx.objectStore(STORE).clear();
+          tx.oncomplete = function () { resolve(true); };
+          tx.onerror = function () {
+            enterFallback(errMessage(tx.error, "indexeddb clear failed"));
+            resolve(true);
+          };
+        } catch (err) {
+          enterFallback(errMessage(err, "indexeddb clear failed"));
+          resolve(true);
+        }
+      });
+    }
+    lsClearPrefix(); /* fallback store only; prefix never matches settings keys */
+    return Promise.resolve(true);
+  };
+
+  /* ---------- emoji classification key helpers ---------- */
+  function currentModel() {
+    try {
+      if (typeof app.getClassifierConfig === "function") {
+        var cfg = app.getClassifierConfig();
+        if (cfg && cfg.model) { return String(cfg.model); }
+      }
+    } catch (err) { /* treat as no model */ }
+    return "";
+  }
+
+  function currentEmojiList() {
+    try {
+      if (typeof app.getEmojiSet === "function") { return app.getEmojiSet(); }
+    } catch (err) { /* fall through to shared set */ }
+    return app.emojiSet || [];
+  }
+
+  cache.makeEmojiKey = function (text) {
+    var emojiHash = stableHash(currentEmojiList().join(" "));
+    var textHash = stableHash(String(text).trim().toLowerCase());
+    return app.config.classifierVersion + "|" + currentModel() + "|" + emojiHash + "|" + textHash;
+  };
+
+  cache.getEmoji = function (text) {
+    return Promise.resolve(cache.get(cache.makeEmojiKey(text))).then(function (value) {
+      if (value && typeof value === "object" && typeof value.emoji === "string") {
+        return value.emoji;
+      }
+      if (typeof value === "string") { return value; }
+      return null;
+    });
+  };
+
+  cache.setEmoji = function (text, emoji) {
+    var list = currentEmojiList();
+    if (!list || list.indexOf(emoji) === -1) { return false; }
+    cache.set(cache.makeEmojiKey(text), {
+      emoji: emoji,
+      model: currentModel(),
+      ts: Date.now()
+    });
+    return true;
+  };
+
+  /* ---------- boot: open the database, resolve ready, announce ---------- */
+  if (typeof w.indexedDB === "undefined" || w.indexedDB === null) {
+    enterFallback("indexeddb unavailable");
+    settleReady("fallback");
+  } else {
+    openDb().then(function () {
+      settleReady("indexeddb");
+    }, function (err) {
+      enterFallback(errMessage(err, "indexeddb open failed"));
+      settleReady("fallback");
+    });
+  }
+})();
+</script><script>
+(async function () {
+  "use strict";
+
+  var w = window;
+
+  /* ---------- shared namespace: read only, never create ---------- */
+  var app = (w.sentiment && w.sentiment.hackernews) || w.hnEmoji || null;
+  if (!app) {
+    try {
+      var errEvt;
+      var errDetail = { method: "classifier", error: "window.sentiment.hackernews namespace missing" };
+      if (typeof w.CustomEvent === "function") {
+        errEvt = new w.CustomEvent("sentiment:error", { detail: errDetail });
+      } else {
+        errEvt = document.createEvent("CustomEvent");
+        errEvt.initCustomEvent("sentiment:error", false, false, errDetail);
+      }
+      w.dispatchEvent(errEvt);
+    } catch (err) { /* host without CustomEvent support */ }
+    return;
+  }
+  w.hnEmoji = app;
+
+  /* ---------- config defaults (fill missing keys only) ---------- */
+  if (app.config.classifyBatchSize === undefined) { app.config.classifyBatchSize = 10; }
+  if (app.config.classifyConcurrency === undefined) { app.config.classifyConcurrency = 2; }
+  if (app.config.classifyTimeoutMs === undefined) { app.config.classifyTimeoutMs = 20000; }
+  if (app.config.classifyRetries === undefined) { app.config.classifyRetries = 2; }
+
+  /* ---------- constants + element handles ---------- */
+  var PENDING_EMOJI = "⏳️";
+  var PENDING_LABEL = "pending";
+  var statusEl = document.getElementById("classifier-status");
+  var submitBtn = document.getElementById("submit-btn");
+
+  /* ---------- local classifier run state ---------- */
+  var queue = [];
+  var queuedSet = (typeof Set === "function") ? new Set() : null;
+  var activeWorkers = 0;
+  var activeControllers = [];
+  var stats = { cacheHits: 0, modelMisses: 0, failed: 0 };
+
+  /* ---------- tiny helpers ---------- */
+  function setStatus(text) {
+    if (statusEl && statusEl.textContent !== text) { statusEl.textContent = text; }
+  }
+
+  var debounce = (app.util && typeof app.util.debounce === "function")
+    ? app.util.debounce
+    : function (fn) { return function () { fn.apply(null, arguments); }; };
+
+  function currentRunId() {
+    var id = app.state._clsRunId;
+    if (typeof id !== "number" || isNaN(id)) { id = 0; app.state._clsRunId = id; }
+    return id;
+  }
+
+  function currentEmojiSet() {
+    try {
+      if (typeof app.getEmojiSet === "function") {
+        var set = app.getEmojiSet();
+        if (set && set.length > 0) { return set; }
+      }
+    } catch (err) { /* fall through to shared set */ }
+    return app.emojiSet || [];
+  }
+
+  function cacheReadyPromise() {
+    try {
+      if (app.cache && app.cache.ready && typeof app.cache.ready.then === "function") {
+        return app.cache.ready;
+      }
+    } catch (err) { /* fall through */ }
+    return Promise.resolve("unavailable");
+  }
+
+  /* ---------- configured(): model + endpoint required, key may be empty ---------- */
+  function configured() {
+    var cfg = null;
+    try {
+      if (typeof app.getClassifierConfig === "function") { cfg = app.getClassifierConfig(); }
+    } catch (err) { cfg = null; }
+    if (!cfg || !cfg.model || !cfg.endpoint) {
+      setStatus("classifier not configured");
+      return false;
+    }
+    return true;
+  }
+
+  /* ---------- status line: cache hits, model misses, failed, classified of total ---------- */
+  function statusText() {
+    var rows = app.state.commentRows || [];
+    var classified = 0;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && rows[i].emoji) { classified++; }
+    }
+    return "classified " + classified + " of " + rows.length +
+      " · cache " + stats.cacheHits +
+      " · model " + stats.modelMisses +
+      " · failed " + stats.failed;
+  }
+
+  var scheduleStatus = debounce(function () { setStatus(statusText()); }, 160);
+
+  /* ---------- recomputeTops: counts only rows with non null emoji ---------- */
+  function recomputeTops() {
+    var rows = app.state.commentRows || [];
+    var globalCounts = {};
+    var storyCounts = {};
+    var i, row, sid;
+    for (i = 0; i < rows.length; i++) {
+      row = rows[i];
+      if (!row || row.emoji === null || row.emoji === undefined) { continue; }
+      globalCounts[row.emoji] = (globalCounts[row.emoji] || 0) + 1;
+      sid = String(row.storyId);
+      if (!storyCounts[sid]) { storyCounts[sid] = {}; }
+      storyCounts[sid][row.emoji] = (storyCounts[sid][row.emoji] || 0) + 1;
+    }
+
+    var sortedGlobal = app.util.sortEmojiCounts(globalCounts);
+    var gt = app.state.globalTop;
+    if (!gt || typeof gt.length !== "number") { gt = []; app.state.globalTop = gt; }
+    gt.length = 0;
+    for (i = 0; i < sortedGlobal.length; i++) { gt.push(sortedGlobal[i]); }
+
+    var st = app.state.storyTop;
+    if (!st || typeof st !== "object" || Object.prototype.toString.call(st) === "[object Array]") {
+      st = {};
+      app.state.storyTop = st;
+    }
+    for (var key in st) {
+      if (Object.prototype.hasOwnProperty.call(st, key)) { delete st[key]; }
+    }
+    for (sid in storyCounts) {
+      if (Object.prototype.hasOwnProperty.call(storyCounts, sid)) {
+        st[sid] = app.util.sortEmojiCounts(storyCounts[sid]);
+      }
+    }
+  }
+
+  /* ---------- emoji overlay: writes known emojis onto the existing DOM ---------- */
+  function entryAt(top, i) {
+    if (!top || i >= top.length) { return null; }
+    var item = top[i];
+    if (item === null || item === undefined) { return null; }
+    if (Object.prototype.toString.call(item) === "[object Array]") {
+      return item[0] ? { emoji: item[0], count: Number(item[1]) || 0 } : null;
+    }
+    if (typeof item === "object" && item.emoji) {
+      return { emoji: item.emoji, count: Number(item.count) || 0 };
+    }
+    return null;
+  }
+
+  function fillSlot(slotEl, entry, countClass) {
+    if (!slotEl) { return; }
+    var countEl = slotEl.querySelector("." + countClass);
+    slotEl.textContent = "";
+    slotEl.appendChild(document.createTextNode(entry ? entry.emoji : PENDING_EMOJI));
+    if (!countEl) {
+      countEl = document.createElement("span");
+      countEl.className = countClass;
+    }
+    countEl.textContent = entry ? String(entry.count) : PENDING_LABEL;
+    slotEl.appendChild(countEl);
+  }
+
+  function overlayGlobalSummary() {
+    var summary = document.getElementById("global-emoji-summary");
+    if (!summary) { return; }
+    var slots = summary.querySelectorAll(".global-emoji-slot");
+    var top = app.state.globalTop || [];
+    for (var i = 0; i < slots.length; i++) {
+      fillSlot(slots[i], entryAt(top, i), "global-emoji-count");
+    }
+  }
+
+  function overlayStoryCards() {
+    var list = document.getElementById("story-list");
+    if (!list) { return; }
+    var stories = app.state.stories || [];
+    var order = {};
+    var i;
+    for (i = 0; i < stories.length; i++) {
+      if (stories[i]) { order[String(stories[i].id)] = i; }
+    }
+    var cards = list.querySelectorAll(".story-card[data-story-id]");
+    var sorted = [];
+    for (i = 0; i < cards.length; i++) { sorted.push(cards[i]); }
+    sorted.sort(function (a, b) {
+      var oa = order[a.getAttribute("data-story-id")];
+      var ob = order[b.getAttribute("data-story-id")];
+      if (oa === undefined) { oa = 1000000000; }
+      if (ob === undefined) { ob = 1000000000; }
+      return oa - ob;
+    });
+    var storyTop = app.state.storyTop || {};
+    for (i = 0; i < sorted.length; i++) {
+      var card = sorted[i];
+      var top = storyTop[String(card.getAttribute("data-story-id"))];
+      var slots = card.querySelectorAll(".story-emoji-slot");
+      for (var j = 0; j < slots.length; j++) {
+        fillSlot(slots[j], entryAt(top, j), "story-emoji-count");
+      }
+    }
+  }
+
+  function overlayExpandedComments() {
+    var list = document.getElementById("story-list");
+    if (!list) { return; }
+    var openCards = list.querySelectorAll(".story-card.open[data-story-id]");
+    var rows = app.state.commentRows || [];
+    for (var c = 0; c < openCards.length; c++) {
+      var card = openCards[c];
+      var sid = String(card.getAttribute("data-story-id"));
+      var spans = card.querySelectorAll(".story-comments .comment-emoji");
+      if (spans.length === 0) { continue; }
+      var idx = 0;
+      for (var i = 0; i < rows.length && idx < spans.length; i++) {
+        var row = rows[i];
+        if (row && String(row.storyId) === sid) {
+          spans[idx].textContent = row.emoji || PENDING_EMOJI;
+          idx++;
+        }
+      }
+    }
+  }
+
+  function applyEmojiOverlay() {
+    overlayGlobalSummary();
+    overlayStoryCards();
+    overlayExpandedComments();
+  }
+
+  var scheduleOverlay = debounce(function () { applyEmojiOverlay(); }, 120);
+
+  /* ---------- renderAll: wrap previous renderer once, then overlay ---------- */
+  var previousRenderAll = (typeof app.renderAll === "function") ? app.renderAll : null;
+  if (previousRenderAll && previousRenderAll._emojiOverlayBase !== undefined) {
+    previousRenderAll = previousRenderAll._emojiOverlayBase; /* never wrap twice */
+  }
+  var wrappedRenderAll = function () {
+    if (previousRenderAll) {
+      try { previousRenderAll.apply(app, arguments); }
+      catch (err) {
+        app.emit("sentiment:error", { method: "renderAll", error: String((err && err.message) || err) });
+      }
+    }
+    applyEmojiOverlay();
+    return app.state.stories;
+  };
+  wrappedRenderAll._emojiOverlayBase = previousRenderAll;
+  app.renderAll = wrappedRenderAll;
+
+  /* ---------- setRowEmoji: mutate, recompute, emit, schedule overlay ---------- */
+  function setRowEmoji(row, emoji, myRun) {
+    if (!row || !emoji) { return; }
+    if (myRun !== undefined && myRun !== currentRunId()) { return; }
+    row.emoji = emoji;
+    recomputeTops();
+    app.emit("sentiment:comment-emoji", row);
+    scheduleOverlay();
+  }
+
+  /* ---------- response parsing ---------- */
+  function parseTopArray(text) {
+    var t = String(text === null || text === undefined ? "" : text).replace(/^\s+|\s+$/g, "");
+    try {
+      var direct = JSON.parse(t);
+      if (Object.prototype.toString.call(direct) === "[object Array]") { return direct; }
+    } catch (err) { /* try slicing below */ }
+    var start = t.indexOf("[");
+    var end = t.lastIndexOf("]");
+    if (start !== -1 && end > start) {
+      try {
+        var sliced = JSON.parse(t.slice(start, end + 1));
+        if (Object.prototype.toString.call(sliced) === "[object Array]") { return sliced; }
+      } catch (err2) { /* no top level array */ }
+    }
+    return null;
+  }
+
+  /* ---------- askModel: one batch call with timeout + bounded retries ----------
+     resolves to a validated emoji array, or null on any failure. */
+  function askModel(texts, myRun) {
+    if (!configured()) { return Promise.resolve(null); }
+    var cfg = app.getClassifierConfig();
+    var emojiSet = currentEmojiSet();
+    var prompt =
+      "Classify each Hacker News comment into exactly one emoji from this set: " +
+      emojiSet.join(" ") + ".\n" +
+      "The input is a JSON array of strings. Return a JSON array of emoji strings only, " +
+      "same length, same order. No markdown, no explanation.\n" +
+      "Input:\n" + JSON.stringify(texts);
+
+    var headers = { "Content-Type": "application/json" };
+    if (cfg.key) { headers["Authorization"] = "Bearer " + cfg.key; }
+
+    var body = JSON.stringify({
+      model: cfg.model,
+      messages: [{ role: "user", content: prompt }],
+      stream: false
+    });
+
+    var attempts = 0;
+    var maxAttempts = 1 + Math.max(0, Number(app.config.classifyRetries) || 0);
+    var timeoutMs = Math.max(1000, Number(app.config.classifyTimeoutMs) || 20000);
+
+    function invalidError(message) {
+      var err = new Error(message);
+      err.invalid = true;
+      return err;
+    }
+
+    function tryOnce() {
+      attempts++;
+      var controller = (typeof AbortController === "function") ? new AbortController() : null;
+      if (controller) { activeControllers.push(controller); }
+      var timer = setTimeout(function () {
+        if (controller) { try { controller.abort(); } catch (err) { /* already settled */ } }
+      }, timeoutMs);
+
+      function cleanup() {
+        clearTimeout(timer);
+        if (controller) {
+          var idx = activeControllers.indexOf(controller);
+          if (idx !== -1) { activeControllers.splice(idx, 1); }
+        }
+      }
+
+      var options = { method: "POST", headers: headers, body: body };
+      if (controller) { options.signal = controller.signal; }
+
+      return fetch(cfg.endpoint, options).then(function (response) {
+        if (!response.ok) {
+          var err = new Error("http " + response.status);
+          err.status = response.status;
+          throw err;
+        }
+        return response.json();
+      }).then(function (res) {
+        var text = null;
+        if (res && res.message && typeof res.message.content === "string") {
+          text = res.message.content;
+        } else if (res && res.choices && res.choices[0] && res.choices[0].message &&
+                   typeof res.choices[0].message.content === "string") {
+          text = res.choices[0].message.content;
+        }
+        if (text === null) { throw invalidError("no message content"); }
+        var arr = parseTopArray(text);
+        if (!arr) { throw invalidError("no top level array"); }
+        if (arr.length !== texts.length) { throw invalidError("length mismatch"); }
+        var valid = currentEmojiSet();
+        for (var i = 0; i < arr.length; i++) {
+          if (typeof arr[i] !== "string" || valid.indexOf(arr[i]) === -1) {
+            throw invalidError("emoji outside set");
+          }
+        }
+        return arr;
+      }).then(function (arr) {
+        cleanup();
+        return arr;
+      }, function (err) {
+        cleanup();
+        if (controller && controller._cancelled) { return null; }
+        if (myRun !== undefined && myRun !== currentRunId()) { return null; }
+        if (err && err.invalid) { return null; } /* invalid output: caller falls back per row */
+        var retryable = false;
+        if (err && typeof err.status === "number") {
+          retryable = err.status >= 500; /* 5xx retried, 4xx never retried */
+        } else {
+          retryable = true; /* network error or timeout abort */
+        }
+        if (retryable && attempts < maxAttempts) { return tryOnce(); }
+        return null;
+      });
+    }
+
+    return tryOnce();
+  }
+
+  /* ---------- fallback: individual calls for texts whose batch failed ---------- */
+  function fallbackIndividual(rows, myRun) {
+    var i = 0;
+    function next() {
+      if (myRun !== currentRunId() || i >= rows.length) { return null; }
+      var row = rows[i];
+      i++;
+      var text = row.text === null || row.text === undefined ? "" : String(row.text);
+      return askModel([text], myRun).then(function (arr) {
+        if (myRun !== currentRunId()) { return null; }
+        if (arr && arr[0]) {
+          try { app.cache.setEmoji(row.text, arr[0]); } catch (err) { /* best effort */ }
+          setRowEmoji(row, arr[0], myRun);
+        } else {
+          stats.failed++;
+        }
+        scheduleStatus();
+        return next();
+      });
+    }
+    return next();
+  }
+
+  /* ---------- processBatch: cache first, model only for misses ---------- */
+  function processBatch(batch, myRun) {
+    var checks = [];
+    for (var i = 0; i < batch.length; i++) {
+      (function (row) {
+        var p;
+        try { p = Promise.resolve(app.cache.getEmoji(row.text)); }
+        catch (err) { p = Promise.resolve(null); }
+        checks.push(p.then(
+          function (emoji) { return { row: row, emoji: emoji }; },
+          function () { return { row: row, emoji: null }; }
+        ));
+      })(batch[i]);
+    }
+    return Promise.all(checks).then(function (results) {
+      if (myRun !== currentRunId()) { return; }
+      var misses = [];
+      var valid = currentEmojiSet();
+      var i;
+      for (i = 0; i < results.length; i++) {
+        var emoji = results[i].emoji;
+        if (emoji && valid.indexOf(emoji) !== -1) {
+          stats.cacheHits++;
+          setRowEmoji(results[i].row, emoji, myRun);
+        } else {
+          misses.push(results[i].row);
+        }
+      }
+      scheduleStatus();
+      if (misses.length === 0 || myRun !== currentRunId()) { return; }
+      if (!configured()) { return; } /* leave unclassified; a later config change requeues */
+      stats.modelMisses += misses.length;
+      scheduleStatus();
+      var texts = [];
+      for (i = 0; i < misses.length; i++) {
+        texts.push(misses[i].text === null || misses[i].text === undefined ? "" : String(misses[i].text));
+      }
+      return askModel(texts, myRun).then(function (arr) {
+        if (myRun !== currentRunId()) { return; }
+        if (arr) {
+          for (var j = 0; j < misses.length; j++) {
+            try { app.cache.setEmoji(misses[j].text, arr[j]); } catch (err) { /* best effort */ }
+            setRowEmoji(misses[j], arr[j], myRun);
+          }
+          scheduleStatus();
+          return;
+        }
+        return fallbackIndividual(misses, myRun);
+      });
+    });
+  }
+
+  /* ---------- FIFO queue + bounded worker pool ---------- */
+  function enqueueRow(row) {
+    if (!row || row.emoji) { return false; }
+    if (queuedSet) {
+      if (queuedSet.has(row)) { return false; }
+      queuedSet.add(row);
+    } else if (queue.indexOf(row) !== -1) { return false; }
+    queue.push(row);
+    return true;
+  }
+
+  function enqueueRows(rows) {
+    if (!rows) { return; }
+    var added = false;
+    for (var i = 0; i < rows.length; i++) {
+      if (enqueueRow(rows[i])) { added = true; }
+    }
+    if (added) { pump(); }
+  }
+
+  function pump() {
+    if (queue.length === 0) { return; }
+    if (!configured()) { return; }
+    var limit = Math.max(1, Number(app.config.classifyConcurrency) || 1);
+    while (activeWorkers < limit && queue.length > 0) {
+      activeWorkers++;
+      workerLoop(currentRunId());
+    }
+  }
+
+  function endWorker() {
+    activeWorkers--;
+    if (activeWorkers < 0) { activeWorkers = 0; }
+    if (queue.length > 0) { pump(); } /* backfill after a cancelled run */
+  }
+
+  function workerLoop(myRun) {
+    cacheReadyPromise().then(function () {
+      function step() {
+        if (myRun !== currentRunId() || queue.length === 0) { endWorker(); return; }
+        var size = Math.max(1, Number(app.config.classifyBatchSize) || 10);
+        var batch = [];
+        while (batch.length < size && queue.length > 0) {
+          var row = queue.shift();
+          if (queuedSet) { queuedSet.delete(row); }
+          if (row && !row.emoji) { batch.push(row); }
+        }
+        if (batch.length === 0) { endWorker(); return; }
+        processBatch(batch, myRun).then(step, function (err) {
+          app.emit("sentiment:error", { method: "classify", error: String((err && err.message) || err) });
+          step();
+        });
+      }
+      step();
+    }, function () { endWorker(); });
+  }
+
+  /* ---------- cancellation: new story run invalidates in-flight work ---------- */
+  app.on("sentiment:stories-loading", function () {
+    app.state._clsRunId = currentRunId() + 1;
+    queue.length = 0;
+    if (queuedSet) {
+      if (typeof queuedSet.clear === "function") { queuedSet.clear(); }
+      else { queuedSet = new Set(); }
+    }
+    for (var i = 0; i < activeControllers.length; i++) {
+      var c = activeControllers[i];
+      if (c) {
+        c._cancelled = true;
+        try { c.abort(); } catch (err) { /* already settled */ }
+      }
+    }
+    activeControllers.length = 0;
+    stats.cacheHits = 0;
+    stats.modelMisses = 0;
+    stats.failed = 0;
+  });
+
+  /* ---------- submit: classify whatever rows exist, never refetch ---------- */
+  if (submitBtn) {
+    submitBtn.addEventListener("click", function () {
+      if (!configured()) { return; }
+      enqueueRows(app.state.commentRows || []);
+    });
+  }
+
+  /* ---------- enqueue each comment row as it lands ---------- */
+  app.on("sentiment:comment-row", function (row) {
+    if (!row || row.emoji) { return; }
+    if (!configured()) { return; }
+    if (enqueueRow(row)) { pump(); }
+  });
+
+  /* ---------- comment scan done: flush the rest, report progress ---------- */
+  app.on("sentiment:comments", function () {
+    if (!configured()) { return; }
+    enqueueRows(app.state.commentRows || []);
+    setStatus(statusText());
+  });
+
+  /* ---------- config or emoji set changed: cached keys changed meaning ---------- */
+  function resetAndRequeue() {
+    var rows = app.state.commentRows || [];
+    var i;
+    for (i = 0; i < rows.length; i++) {
+      if (rows[i]) { rows[i].emoji = null; }
+    }
+    var gt = app.state.globalTop;
+    if (gt && typeof gt.length === "number") { gt.length = 0; }
+    else { app.state.globalTop = []; }
+    var st = app.state.storyTop;
+    if (st && typeof st === "object") {
+      for (var key in st) {
+        if (Object.prototype.hasOwnProperty.call(st, key)) { delete st[key]; }
+      }
+    } else { app.state.storyTop = {}; }
+    stats.cacheHits = 0;
+    stats.modelMisses = 0;
+    stats.failed = 0;
+    if (configured()) {
+      enqueueRows(rows);
+      setStatus(statusText());
+    }
+    scheduleOverlay();
+  }
+  app.on("sentiment:emoji-set", resetAndRequeue);
+  app.on("sentiment:classifier-config", resetAndRequeue);
+
+  /* ---------- initial paint: overlay whatever state already exists ---------- */
+  applyEmojiOverlay();
+})();
+</script><script>setTimeout(() => {document.querySelector('#submit-btn').click()}, 50)</script>
