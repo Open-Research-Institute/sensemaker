@@ -24,6 +24,24 @@
 ## What is it?
 **The Sensemaker is a browser-based dashboard builder for social media.** You program the system by clicking and following hyperlinks that fetch, transform, and visualize data.
 
+## Local Setup
+
+### Requirements:
+- git - https://git-scm.com/install/
+- nodejs - https://nodejs.org/en/download
+
+### Terminal Commands:
+```bash
+# clone the project and dependencies
+git clone --recursive https://github.com/Open-Research-Institute/sensemaker
+
+# install dependencies
+npm run install
+
+# start the server on http://localhost:8080
+npm start
+```
+
 ## Quickstart - First 5 minutes
 
 coming soon
