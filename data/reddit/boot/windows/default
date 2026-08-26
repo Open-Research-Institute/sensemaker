@@ -1,1 +1,0 @@
-if (window._bootWindowsDefault) return; window._bootWindowsDefault = true; if (filename === 'main') { window.addEventListener('main:ready', function() { window.openFileWindow('reddit#welcome.md'); }); } 
